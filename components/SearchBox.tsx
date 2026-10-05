@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { IconSearch } from "./icons";
 
 export default function SearchBox() {
   const router = useRouter();
@@ -9,18 +10,23 @@ export default function SearchBox() {
 
   return (
     <form
-      className="hidden md:block"
+      className="relative hidden md:block"
+      role="search"
       onSubmit={(e) => {
         e.preventDefault();
         router.push(`/apps?q=${encodeURIComponent(q.trim())}`);
       }}
     >
+      <IconSearch
+        size={15}
+        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500"
+      />
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Search apps, articles, help…"
-        aria-label="Search magistick"
-        className="w-64 rounded-full border border-line bg-panel px-4 py-1.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-brand-500 focus:outline-none"
+        placeholder="Search apps…"
+        aria-label="Search apps"
+        className="w-52 rounded-full border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-[13px] text-paper placeholder:text-stone-500 transition-all duration-300 focus:w-64 focus:border-ember/60 focus:bg-white/[0.07] focus:outline-none"
       />
     </form>
   );

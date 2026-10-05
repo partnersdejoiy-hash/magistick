@@ -1,38 +1,39 @@
 import Link from "next/link";
 import HeaderNav from "./HeaderNav";
 import SearchBox from "./SearchBox";
+import { IconBell } from "./icons";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-ink/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
-        <Link href="/" className="flex items-center gap-2" aria-label="magistick home">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-accent text-lg font-black text-white">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/95 text-paper backdrop-blur-md">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-5 px-5 sm:px-8">
+        <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="magistick home">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ember font-display text-xl font-bold italic text-paper shadow-[0_4px_14px_-4px_rgba(217,72,15,0.7)] transition-transform duration-300 group-hover:-rotate-6">
             m
           </span>
-          <span className="text-lg font-bold tracking-tight">
-            magi<span className="text-brand-400">stick</span>
+          <span className="font-display text-[19px] font-semibold tracking-tight">
+            magi<span className="text-ember">stick</span>
           </span>
         </Link>
 
         <HeaderNav />
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2.5">
           <SearchBox />
           <button
-            className="relative rounded-full border border-line bg-panel p-2 text-slate-300 hover:text-white"
+            type="button"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-stone-300 transition-colors hover:border-white/20 hover:text-paper"
             aria-label="Notifications"
             title="Notifications (coming soon)"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-            </svg>
+            <IconBell size={17} />
+            <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-ember" aria-hidden />
           </button>
           <button
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent text-xs font-bold text-white"
+            type="button"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-ember font-sans text-xs font-bold text-paper transition-transform duration-300 hover:scale-105"
             aria-label="Your profile"
-            title="Profile (coming soon)"
+            title="Deepak Sharma — profile (coming soon)"
           >
             DS
           </button>

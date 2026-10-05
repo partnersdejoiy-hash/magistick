@@ -1,6 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { EASE } from "./motion";
+import { IconArrowLeft, IconChevronDown, IconInbox, IconPlus } from "./icons";
 
 type Ticket = {
   id: number;
@@ -25,6 +28,15 @@ type Comment = {
 
 const STATUS_TABS = ["all", "open", "in_progress", "waiting", "resolved", "closed"] as const;
 
+const STATUS_DOT: Record<string, string> = {
+  open: "bg-sky-500",
+  assigned: "bg-indigo-500",
+  in_progress: "bg-amber-500",
+  waiting: "bg-stone-400",
+  resolved: "bg-emerald-600",
+  closed: "bg-stone-300",
+};
+
 async function api(path: string, init?: RequestInit) {
   const res = await fetch(`/api/orbitdesk/${path}`, {
     ...init,
@@ -40,24 +52,25 @@ async function api(path: string, init?: RequestInit) {
   return { status: res.status, data: data as { error?: string; detail?: string; data?: Ticket[]; [k: string]: unknown } };
 }
 
-function statusBadge(status: string) {
-  const colors: Record<string, string> = {
-    open: "bg-sky-100 text-sky-700",
-    assigned: "bg-indigo-100 text-indigo-700",
-    in_progress: "bg-amber-100 text-amber-700",
-    waiting: "bg-violet-100 text-violet-700",
-    resolved: "bg-emerald-100 text-emerald-700",
-    closed: "bg-slate-200 text-slate-600",
-  };
+const inputCls =
+  "mt-1.5 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-stone-400 shadow-card focus:border-ember/60 focus:outline-none transition-colors";
+
+function SkeletonRows() {
   return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${colors[status] ?? "bg-slate-200 text-slate-600"}`}>
-      {status.replace("_", " ")}
-    </span>
+    <div className="border-t border-line" aria-label="Loading tickets" role="status">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="flex items-center gap-4 border-b border-line px-2 py-4 sm:px-4">
+          <div className="skeleton h-2.5 w-2.5 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <div className="skeleton h-3.5 w-2/3 rounded" />
+            <div className="skeleton h-3 w-1/3 rounded" />
+          </div>
+        </div>
+      ))}
+      <span className="sr-only">Loading tickets…</span>
+    </div>
   );
 }
-
-const inputCls =
-  "mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:outline-none";
 
 /**
  * My Tickets — raises + tracks OrbitDesk tickets inline (no new tab).
@@ -95,7 +108,6 @@ export default function TicketPanel() {
   }, [load]);
 
   useEffect(() => {
-    // department picker for the new-ticket form (best effort)
     api("departments").then(({ status, data }) => {
       if (status === 200 && Array.isArray(data)) {
         setDepartments((data as { id: number; name: string }[]).map((d) => ({ id: d.id, name: d.name })));
@@ -114,11 +126,14 @@ export default function TicketPanel() {
 
   if (notConnected) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-        <p className="text-lg font-semibold text-slate-900">Help desk not connected yet</p>
-        <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+      <div className="rounded-3xl border border-dashed border-line bg-white/60 p-12 text-center">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-ember-tint text-ember">
+          <IconInbox size={22} />
+        </span>
+        <p className="mt-4 font-display text-xl font-semibold text-ink">Help desk not connected yet</p>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-stone-500">
           The ticket page is wired to OrbitDesk through a server-side proxy, but the service
-          credentials aren’t configured. See <code className="text-violet-600">docs/orbitdesk-interlink.md</code> for
+          credentials aren’t configured. See <code className="rounded bg-parchment px-1.5 py-0.5 text-[12px] text-ember-ink">docs/orbitdesk-interlink.md</code> for
           the phase-2 wiring checklist — no OrbitDesk code changes needed.
         </p>
       </div>
@@ -127,43 +142,53 @@ export default function TicketPanel() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Ticket status filter">
-          {STATUS_TABS.map((s) => (
-            <button
-              key={s}
-              role="tab"
-              aria-selected={tab === s}
-              onClick={() => {
-                setTab(s);
-                setSelected(null);
-              }}
-              className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${
-                tab === s
-                  ? "bg-violet-600 text-white shadow-sm"
-                  : "border border-slate-300 bg-white text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              {s.replace("_", " ")}
-            </button>
-          ))}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-1 rounded-full border border-line bg-white p-1 shadow-card" role="tablist" aria-label="Ticket status filter">
+          {STATUS_TABS.map((s) => {
+            const active = tab === s;
+            return (
+              <button
+                key={s}
+                role="tab"
+                aria-selected={active}
+                onClick={() => {
+                  setTab(s);
+                  setSelected(null);
+                }}
+                className={`relative rounded-full px-3.5 py-1.5 text-[12.5px] font-medium capitalize transition-colors ${
+                  active ? "text-paper" : "text-stone-500 hover:text-ink"
+                }`}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="ticket-tab-pill"
+                    className="absolute inset-0 rounded-full bg-ink"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                  />
+                )}
+                <span className="relative">{s.replace("_", " ")}</span>
+              </button>
+            );
+          })}
         </div>
-        <button
+        <motion.button
+          whileTap={{ scale: 0.96 }}
           onClick={() => setShowForm((v) => !v)}
-          className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500"
+          className="flex items-center gap-2 rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-paper shadow-[0_8px_20px_-8px_rgba(217,72,15,0.7)] transition-colors hover:bg-ember-deep"
         >
-          {showForm ? "Close form" : "+ New ticket"}
-        </button>
+          <IconPlus size={15} />
+          {showForm ? "Close form" : "New ticket"}
+        </motion.button>
       </div>
 
       {showForm && <NewTicketForm departments={departments} onCreated={() => { setShowForm(false); load(); }} />}
 
       {error && (
-        <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>
+        <p className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       )}
 
       {loading ? (
-        <p className="py-10 text-center text-sm text-slate-500">Loading tickets…</p>
+        <SkeletonRows />
       ) : selected ? (
         <TicketThread
           ticket={selected}
@@ -175,23 +200,39 @@ export default function TicketPanel() {
           }}
         />
       ) : tickets.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500 shadow-sm">
-          No tickets here. Raise one with “+ New ticket”.
-        </p>
+        <div className="rounded-3xl border border-dashed border-line bg-white/60 p-12 text-center">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-parchment text-stone-400">
+            <IconInbox size={22} />
+          </span>
+          <p className="mt-4 font-display text-xl font-semibold text-ink">All clear</p>
+          <p className="mt-1 text-sm text-stone-500">No tickets here. Raise one with “New ticket”.</p>
+        </div>
       ) : (
-        <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          {tickets.map((t) => (
-            <li key={t.id}>
-              <button onClick={() => openTicket(t.id)} className="flex w-full items-center gap-4 px-4 py-3 text-left hover:bg-slate-50">
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-900">{t.subject}</p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    {t.ticket_number} · {new Date(t.created_at).toLocaleDateString()} · {t.priority}
-                  </p>
-                </div>
-                {statusBadge(t.status)}
+        <ul className="border-t border-line">
+          {tickets.map((t, i) => (
+            <motion.li
+              key={t.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: Math.min(i, 8) * 0.04, ease: EASE }}
+            >
+              <button
+                onClick={() => openTicket(t.id)}
+                className="group flex w-full items-center gap-3.5 border-b border-line px-2 py-4 text-left transition-colors hover:bg-parchment/50 sm:px-4"
+              >
+                <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${STATUS_DOT[t.status] ?? "bg-stone-300"}`} aria-hidden />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[14.5px] font-semibold tracking-tight text-ink">{t.subject}</span>
+                  <span className="mt-1 block text-xs tabular-nums text-stone-500">
+                    {t.ticket_number} · {new Date(t.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} · <span className="capitalize">{t.priority}</span> priority
+                  </span>
+                </span>
+                <span className="shrink-0 text-[12px] font-medium capitalize text-stone-400">
+                  {t.status.replace("_", " ")}
+                </span>
+                <IconChevronDown size={15} className="-rotate-90 text-stone-300 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-ember" />
               </button>
-            </li>
+            </motion.li>
           ))}
         </ul>
       )}
@@ -229,11 +270,18 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
   };
 
   return (
-    <form onSubmit={submit} className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="text-sm font-semibold text-slate-900">Raise a ticket</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+    <motion.form
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: EASE }}
+      onSubmit={submit}
+      className="mb-8 rounded-3xl border border-line bg-white p-6 shadow-card sm:p-8"
+    >
+      <h2 className="font-display text-xl font-semibold tracking-tight text-ink">Raise a ticket</h2>
+      <p className="mt-1 text-[13px] text-stone-500">Describe it well — good tickets get fixed faster.</p>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <label className="block sm:col-span-2">
-          <span className="text-xs font-medium text-slate-600">Subject *</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">Subject *</span>
           <input
             required
             value={subject}
@@ -243,7 +291,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
           />
         </label>
         <label className="block">
-          <span className="text-xs font-medium text-slate-600">Department</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">Department</span>
           <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} className={inputCls}>
             <option value="">General</option>
             {departments.map((d) => (
@@ -252,7 +300,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
           </select>
         </label>
         <label className="block">
-          <span className="text-xs font-medium text-slate-600">Priority</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">Priority</span>
           <select value={priority} onChange={(e) => setPriority(e.target.value)} className={inputCls}>
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -261,7 +309,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
           </select>
         </label>
         <label className="block sm:col-span-2">
-          <span className="text-xs font-medium text-slate-600">Describe the issue *</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">Describe the issue *</span>
           <textarea
             required
             rows={4}
@@ -273,14 +321,15 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
         </label>
       </div>
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-      <button
+      <motion.button
+        whileTap={{ scale: 0.97 }}
         type="submit"
         disabled={saving}
-        className="mt-4 rounded-xl bg-violet-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 disabled:opacity-50"
+        className="mt-5 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember disabled:opacity-50"
       >
         {saving ? "Raising…" : "Submit ticket"}
-      </button>
-    </form>
+      </motion.button>
+    </motion.form>
   );
 }
 
@@ -308,48 +357,78 @@ function TicketThread({ ticket, comments, onBack, onCommented }: {
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <button onClick={onBack} className="text-xs font-medium text-violet-600 hover:text-violet-500">← All tickets</button>
-      <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h2 className="text-base font-semibold text-slate-900">{ticket.subject}</h2>
-        {statusBadge(ticket.status)}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: EASE }}
+      className="rounded-3xl border border-line bg-white p-6 shadow-card sm:p-8"
+    >
+      <button
+        onClick={onBack}
+        className="flex items-center gap-1.5 text-[13px] font-medium text-stone-500 transition-colors hover:text-ember"
+      >
+        <IconArrowLeft size={14} /> All tickets
+      </button>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">{ticket.subject}</h2>
+        <span className="flex items-center gap-1.5 rounded-full bg-parchment px-3 py-1 text-[12px] font-medium capitalize text-stone-600">
+          <span className={`h-2 w-2 rounded-full ${STATUS_DOT[ticket.status] ?? "bg-stone-300"}`} aria-hidden />
+          {ticket.status.replace("_", " ")}
+        </span>
       </div>
-      <p className="mt-1 text-xs text-slate-500">
+      <p className="mt-2 text-xs tabular-nums text-stone-500">
         {ticket.ticket_number}
-        {ticket.department?.name ? ` · ${ticket.department.name}` : ""} · {ticket.priority} priority
+        {ticket.department?.name ? ` · ${ticket.department.name}` : ""} · <span className="capitalize">{ticket.priority}</span> priority
       </p>
-      <p className="mt-4 whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm text-slate-700">{ticket.description}</p>
+      <p className="mt-5 whitespace-pre-wrap rounded-2xl bg-parchment/70 p-5 text-[14.5px] leading-relaxed text-ink/90">
+        {ticket.description}
+      </p>
 
-      <h3 className="mt-6 text-sm font-semibold text-slate-900">Thread</h3>
-      <ul className="mt-3 space-y-3">
-        {comments.map((c) => (
-          <li key={c.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <p className="text-xs text-slate-500">
-              {c.author?.name ?? "Support"} · {new Date(c.created_at).toLocaleString()}
+      <h3 className="mt-8 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+        Thread · {comments.length}
+      </h3>
+      <ul className="mt-4 space-y-4">
+        {comments.map((c, i) => (
+          <motion.li
+            key={c.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: Math.min(i, 6) * 0.05, ease: EASE }}
+            className="rounded-2xl border border-line bg-paper p-4"
+          >
+            <p className="text-xs text-stone-500">
+              <span className="font-semibold text-ink">{c.author?.name ?? "Support"}</span>
+              <span className="mx-1.5 text-stone-300">·</span>
+              {new Date(c.created_at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
             </p>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{c.body}</p>
-          </li>
+            <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-ink/90">{c.body}</p>
+          </motion.li>
         ))}
-        {comments.length === 0 && <li className="text-sm text-slate-500">No replies yet.</li>}
+        {comments.length === 0 && (
+          <li className="rounded-2xl border border-dashed border-line p-6 text-center text-sm text-stone-500">
+            No replies yet — the support team will respond here.
+          </li>
+        )}
       </ul>
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-5 flex gap-2.5">
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") send(); }}
           placeholder="Write a reply…"
           aria-label="Write a reply"
-          className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:outline-none"
+          className="flex-1 rounded-full border border-line bg-white px-4 py-2.5 text-sm text-ink placeholder:text-stone-400 shadow-card focus:border-ember/60 focus:outline-none"
         />
-        <button
+        <motion.button
+          whileTap={{ scale: 0.95 }}
           onClick={send}
           disabled={sending || !draft.trim()}
-          className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 disabled:opacity-50"
+          className="rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember-deep disabled:opacity-40"
         >
           {sending ? "Sending…" : "Reply"}
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }

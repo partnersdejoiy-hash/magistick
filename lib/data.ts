@@ -1,11 +1,13 @@
+import type { AppIconKey } from "@/components/icons";
+
 export type AppEntry = {
   id: string;
   name: string;
   blurb: string;
   category: string;
   href: string;
-  /** tailwind gradient classes for the tile icon */
-  tile: string;
+  /** key into APP_ICONS in components/icons.tsx */
+  icon: AppIconKey;
 };
 
 export const APP_CATEGORIES = [
@@ -17,21 +19,34 @@ export const APP_CATEGORIES = [
   "Culture",
 ] as const;
 
-/** Placeholder BPO app catalog. Real SSO links replace hrefs in phase 2. */
+/** BPO app catalog. Real SSO links replace hrefs in phase 2. */
 export const APPS: AppEntry[] = [
-  { id: "hrms", name: "PeopleHub", blurb: "Profile, documents, org chart", category: "People & HR", href: "#", tile: "from-violet-500 to-fuchsia-600" },
-  { id: "attendance", name: "TimeTrack", blurb: "Attendance, shifts, time-off", category: "Pay & Time", href: "#", tile: "from-sky-500 to-blue-600" },
-  { id: "payroll", name: "PaySlip", blurb: "Payslips & tax forms", category: "Pay & Time", href: "#", tile: "from-emerald-500 to-teal-600" },
-  { id: "learning", name: "SkillUp", blurb: "Onboarding & training tracks", category: "Learning", href: "#", tile: "from-amber-500 to-orange-600" },
-  { id: "it", name: "FixIt", blurb: "IT incidents & requests", category: "IT & Tools", href: "#", tile: "from-rose-500 to-red-600" },
-  { id: "chat", name: "TeamChat", blurb: "Team messaging", category: "IT & Tools", href: "#", tile: "from-indigo-500 to-violet-600" },
-  { id: "meet", name: "MeetUp", blurb: "Video meetings", category: "IT & Tools", href: "#", tile: "from-cyan-500 to-sky-600" },
-  { id: "rewards", name: "Shine", blurb: "Rewards & recognition", category: "Culture", href: "#", tile: "from-yellow-400 to-amber-600" },
-  { id: "ideas", name: "BrightIdeas", blurb: "Suggest improvements", category: "Culture", href: "#", tile: "from-lime-500 to-green-600" },
-  { id: "travel", name: "GoFar", blurb: "Travel & expenses", category: "People & HR", href: "#", tile: "from-purple-500 to-indigo-600" },
-  { id: "refer", name: "ReferWin", blurb: "Refer candidates, earn rewards", category: "People & HR", href: "#", tile: "from-pink-500 to-rose-600" },
-  { id: "quality", name: "QualityLens", blurb: "Audits & quality scores", category: "IT & Tools", href: "#", tile: "from-teal-500 to-emerald-600" },
+  { id: "hrms", name: "PeopleHub", blurb: "Profiles, documents & the org chart", category: "People & HR", href: "#", icon: "people" },
+  { id: "attendance", name: "TimeTrack", blurb: "Shifts, attendance & time-off requests", category: "Pay & Time", href: "#", icon: "clock" },
+  { id: "payroll", name: "PaySlip", blurb: "Payslips, tax forms & reimbursements", category: "Pay & Time", href: "#", icon: "wallet" },
+  { id: "learning", name: "SkillUp", blurb: "Onboarding paths & the training library", category: "Learning", href: "#", icon: "book" },
+  { id: "it", name: "FixIt", blurb: "Report device, network & access issues", category: "IT & Tools", href: "#", icon: "wrench" },
+  { id: "chat", name: "TeamChat", blurb: "Team messaging & channels", category: "IT & Tools", href: "#", icon: "chat" },
+  { id: "meet", name: "MeetUp", blurb: "Video meetings & daily huddles", category: "IT & Tools", href: "#", icon: "video" },
+  { id: "rewards", name: "Shine", blurb: "Recognize teammates & nominations", category: "Culture", href: "#", icon: "award" },
+  { id: "ideas", name: "BrightIdeas", blurb: "Suggest process improvements", category: "Culture", href: "#", icon: "bulb" },
+  { id: "travel", name: "GoFar", blurb: "Travel bookings & expense claims", category: "People & HR", href: "#", icon: "plane" },
+  { id: "refer", name: "ReferWin", blurb: "Refer candidates, earn bonuses", category: "People & HR", href: "#", icon: "userplus" },
+  { id: "quality", name: "QualityLens", blurb: "Audit scores & quality dashboards", category: "IT & Tools", href: "#", icon: "gauge" },
 ];
+
+/** Restrained duotone chip per category — ink icon on a soft warm tint. */
+export const CATEGORY_TINT: Record<string, string> = {
+  "People & HR": "bg-rose-100 text-rose-900",
+  "Pay & Time": "bg-emerald-100 text-emerald-900",
+  Learning: "bg-amber-100 text-amber-900",
+  "IT & Tools": "bg-sky-100 text-sky-900",
+  Culture: "bg-orange-100 text-orange-900",
+};
+
+export function tintFor(category: string): string {
+  return CATEGORY_TINT[category] ?? "bg-stone-200 text-stone-800";
+}
 
 export type Article = {
   slug: string;
@@ -53,8 +68,8 @@ export const ARTICLES: Article[] = [
     date: "2026-10-05",
     body: [
       "magistick is the new front door to everything at DEJOIY BPO. Instead of bookmarking a dozen tools, you open one portal: your apps, your tickets, and every company update live here.",
-      "Start with the app launcher on this page — pin the apps you use daily and they'll stay at the top. Hit Get Help any time you need support; your tickets are raised and tracked right inside magistick, powered by OrbitDesk.",
-      "This is day one. Tell us what's missing via Get Help → Suggest an improvement.",
+      "Start with the app rail on this page — pin the apps you use daily and they'll stay at the top. Hit Get Help any time you need support; your tickets are raised and tracked right inside magistick, powered by OrbitDesk.",
+      "This is day one. Tell us what's missing via Get Help — every suggestion lands directly with the team building this portal.",
     ],
   },
   {
@@ -66,7 +81,7 @@ export const ARTICLES: Article[] = [
     date: "2026-10-05",
     body: [
       "The new Get Help page raises tickets directly into OrbitDesk and shows the full thread — status changes, agent replies, everything — right here in magistick.",
-      "Your open tickets also appear on the home dashboard, so nothing slips.",
+      "Your open tickets also appear on the home dashboard, so nothing slips through the cracks.",
     ],
   },
   {
@@ -78,6 +93,7 @@ export const ARTICLES: Article[] = [
     date: "2026-10-04",
     body: [
       "Shift swap requests need 48 hours' notice through TimeTrack. Leave balances refresh on the 1st — check PaySlip if anything looks off and raise a ticket from Get Help.",
+      "Festival-season rosters lock on the 20th. Talk to your team lead before then if you need changes.",
     ],
   },
 ];
