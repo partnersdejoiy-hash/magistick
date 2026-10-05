@@ -18,24 +18,24 @@ export default function DirectoryPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight">Directory</h1>
-      <p className="mt-1 text-sm text-slate-400">Find teammates across the BPO.</p>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Directory</h1>
+      <p className="mt-1 text-sm text-slate-600">Find teammates across the BPO.</p>
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search by name, team, or role…"
         aria-label="Search directory"
-        className="mt-6 w-full max-w-md rounded-lg border border-line bg-panel px-3 py-2 text-sm placeholder:text-slate-500 focus:border-brand-500 focus:outline-none"
+        className="mt-6 w-full max-w-md rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:outline-none"
       />
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {people.map((p) => (
-          <li key={p.name} className="flex items-center gap-4 rounded-xl border border-line bg-panel p-4">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent text-sm font-bold text-white">
+          <li key={p.name} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-sm font-bold text-white shadow-sm">
               {p.name.split(" ").map((w) => w[0]).join("")}
             </span>
             <div>
-              <p className="text-sm font-semibold text-slate-100">{p.name}</p>
-              <p className="text-xs text-slate-400">{p.role} · {p.team}</p>
+              <p className="text-sm font-semibold text-slate-900">{p.name}</p>
+              <p className="text-xs text-slate-600">{p.role} · {p.team}</p>
               <p className="text-xs text-slate-500">{p.site}</p>
             </div>
           </li>

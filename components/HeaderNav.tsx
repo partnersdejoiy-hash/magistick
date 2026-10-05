@@ -25,8 +25,8 @@ export default function HeaderNav() {
           aria-current={isActive(item.href) ? "page" : undefined}
           className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
             isActive(item.href)
-              ? "bg-panel text-white shadow-[inset_0_-2px_0_0_#f43f5e]"
-              : "text-slate-400 hover:bg-panel hover:text-slate-100"
+              ? "text-white shadow-[inset_0_-2px_0_0_#f43f5e]"
+              : "text-slate-400 hover:text-slate-100"
           }`}
         >
           {item.label}

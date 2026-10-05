@@ -3,19 +3,31 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  @apply bg-ink text-slate-100 antialiased;
+  @apply bg-canvas text-slate-900 antialiased;
 }
 
 /* thin scrollbars for horizontal launchers */
 .scroll-thin::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
+  height: 8px;
+  width: 8px;
 }
 .scroll-thin::-webkit-scrollbar-thumb {
-  background: #2c3448;
+  background: #cbd5e1;
   border-radius: 999px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* hidden scrollbars for carousels (arrows do the scrolling) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

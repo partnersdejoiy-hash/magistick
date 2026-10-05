@@ -42,19 +42,22 @@ async function api(path: string, init?: RequestInit) {
 
 function statusBadge(status: string) {
   const colors: Record<string, string> = {
-    open: "bg-sky-500/15 text-sky-300",
-    assigned: "bg-indigo-500/15 text-indigo-300",
-    in_progress: "bg-amber-500/15 text-amber-300",
-    waiting: "bg-purple-500/15 text-purple-300",
-    resolved: "bg-emerald-500/15 text-emerald-300",
-    closed: "bg-slate-500/15 text-slate-400",
+    open: "bg-sky-100 text-sky-700",
+    assigned: "bg-indigo-100 text-indigo-700",
+    in_progress: "bg-amber-100 text-amber-700",
+    waiting: "bg-violet-100 text-violet-700",
+    resolved: "bg-emerald-100 text-emerald-700",
+    closed: "bg-slate-200 text-slate-600",
   };
   return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${colors[status] ?? "bg-slate-500/15 text-slate-300"}`}>
+    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${colors[status] ?? "bg-slate-200 text-slate-600"}`}>
       {status.replace("_", " ")}
     </span>
   );
 }
+
+const inputCls =
+  "mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:outline-none";
 
 /**
  * My Tickets — raises + tracks OrbitDesk tickets inline (no new tab).
@@ -111,11 +114,11 @@ export default function TicketPanel() {
 
   if (notConnected) {
     return (
-      <div className="rounded-xl border border-dashed border-line bg-panel p-10 text-center">
-        <p className="text-lg font-semibold text-slate-100">Help desk not connected yet</p>
-        <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
+        <p className="text-lg font-semibold text-slate-900">Help desk not connected yet</p>
+        <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
           The ticket page is wired to OrbitDesk through a server-side proxy, but the service
-          credentials aren’t configured. See <code className="text-brand-400">docs/orbitdesk-interlink.md</code> for
+          credentials aren’t configured. See <code className="text-violet-600">docs/orbitdesk-interlink.md</code> for
           the phase-2 wiring checklist — no OrbitDesk code changes needed.
         </p>
       </div>
@@ -136,7 +139,9 @@ export default function TicketPanel() {
                 setSelected(null);
               }}
               className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${
-                tab === s ? "bg-brand-600 text-white" : "border border-line text-slate-400 hover:text-slate-200"
+                tab === s
+                  ? "bg-violet-600 text-white shadow-sm"
+                  : "border border-slate-300 bg-white text-slate-600 hover:text-slate-900"
               }`}
             >
               {s.replace("_", " ")}
@@ -145,7 +150,7 @@ export default function TicketPanel() {
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500"
+          className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500"
         >
           {showForm ? "Close form" : "+ New ticket"}
         </button>
@@ -154,7 +159,7 @@ export default function TicketPanel() {
       {showForm && <NewTicketForm departments={departments} onCreated={() => { setShowForm(false); load(); }} />}
 
       {error && (
-        <p className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</p>
+        <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>
       )}
 
       {loading ? (
@@ -170,16 +175,16 @@ export default function TicketPanel() {
           }}
         />
       ) : tickets.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-line p-10 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500 shadow-sm">
           No tickets here. Raise one with “+ New ticket”.
         </p>
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-panel">
+        <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           {tickets.map((t) => (
             <li key={t.id}>
-              <button onClick={() => openTicket(t.id)} className="flex w-full items-center gap-4 px-4 py-3 text-left hover:bg-white/[0.02]">
+              <button onClick={() => openTicket(t.id)} className="flex w-full items-center gap-4 px-4 py-3 text-left hover:bg-slate-50">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-100">{t.subject}</p>
+                  <p className="truncate text-sm font-semibold text-slate-900">{t.subject}</p>
                   <p className="mt-0.5 text-xs text-slate-500">
                     {t.ticket_number} · {new Date(t.created_at).toLocaleDateString()} · {t.priority}
                   </p>
@@ -224,26 +229,22 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
   };
 
   return (
-    <form onSubmit={submit} className="mb-6 rounded-xl border border-line bg-panel p-5">
-      <h2 className="text-sm font-semibold text-slate-100">Raise a ticket</h2>
+    <form onSubmit={submit} className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 className="text-sm font-semibold text-slate-900">Raise a ticket</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <label className="block sm:col-span-2">
-          <span className="text-xs font-medium text-slate-400">Subject *</span>
+          <span className="text-xs font-medium text-slate-600">Subject *</span>
           <input
             required
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+            className={inputCls}
             placeholder="e.g. Laptop charger stopped working"
           />
         </label>
         <label className="block">
-          <span className="text-xs font-medium text-slate-400">Department</span>
-          <select
-            value={departmentId}
-            onChange={(e) => setDepartmentId(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-          >
+          <span className="text-xs font-medium text-slate-600">Department</span>
+          <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} className={inputCls}>
             <option value="">General</option>
             {departments.map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
@@ -251,12 +252,8 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
           </select>
         </label>
         <label className="block">
-          <span className="text-xs font-medium text-slate-400">Priority</span>
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-          >
+          <span className="text-xs font-medium text-slate-600">Priority</span>
+          <select value={priority} onChange={(e) => setPriority(e.target.value)} className={inputCls}>
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
@@ -264,22 +261,22 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
           </select>
         </label>
         <label className="block sm:col-span-2">
-          <span className="text-xs font-medium text-slate-400">Describe the issue *</span>
+          <span className="text-xs font-medium text-slate-600">Describe the issue *</span>
           <textarea
             required
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+            className={inputCls}
             placeholder="What happened, when, and what you need…"
           />
         </label>
       </div>
-      {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       <button
         type="submit"
         disabled={saving}
-        className="mt-4 rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-500 disabled:opacity-50"
+        className="mt-4 rounded-xl bg-violet-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 disabled:opacity-50"
       >
         {saving ? "Raising…" : "Submit ticket"}
       </button>
@@ -311,26 +308,26 @@ function TicketThread({ ticket, comments, onBack, onCommented }: {
   };
 
   return (
-    <div className="rounded-xl border border-line bg-panel p-5">
-      <button onClick={onBack} className="text-xs font-medium text-brand-400 hover:text-brand-300">← All tickets</button>
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <button onClick={onBack} className="text-xs font-medium text-violet-600 hover:text-violet-500">← All tickets</button>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h2 className="text-base font-semibold text-slate-100">{ticket.subject}</h2>
+        <h2 className="text-base font-semibold text-slate-900">{ticket.subject}</h2>
         {statusBadge(ticket.status)}
       </div>
       <p className="mt-1 text-xs text-slate-500">
         {ticket.ticket_number}
         {ticket.department?.name ? ` · ${ticket.department.name}` : ""} · {ticket.priority} priority
       </p>
-      <p className="mt-4 whitespace-pre-wrap rounded-lg bg-ink p-4 text-sm text-slate-300">{ticket.description}</p>
+      <p className="mt-4 whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm text-slate-700">{ticket.description}</p>
 
-      <h3 className="mt-6 text-sm font-semibold text-slate-200">Thread</h3>
+      <h3 className="mt-6 text-sm font-semibold text-slate-900">Thread</h3>
       <ul className="mt-3 space-y-3">
         {comments.map((c) => (
-          <li key={c.id} className="rounded-lg border border-line bg-ink p-3">
+          <li key={c.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
             <p className="text-xs text-slate-500">
               {c.author?.name ?? "Support"} · {new Date(c.created_at).toLocaleString()}
             </p>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-slate-200">{c.body}</p>
+            <p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{c.body}</p>
           </li>
         ))}
         {comments.length === 0 && <li className="text-sm text-slate-500">No replies yet.</li>}
@@ -343,12 +340,12 @@ function TicketThread({ ticket, comments, onBack, onCommented }: {
           onKeyDown={(e) => { if (e.key === "Enter") send(); }}
           placeholder="Write a reply…"
           aria-label="Write a reply"
-          className="flex-1 rounded-lg border border-line bg-ink px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:outline-none"
         />
         <button
           onClick={send}
           disabled={sending || !draft.trim()}
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 disabled:opacity-50"
+          className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 disabled:opacity-50"
         >
           {sending ? "Sending…" : "Reply"}
         </button>
