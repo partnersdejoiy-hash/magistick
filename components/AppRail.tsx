@@ -6,6 +6,7 @@ import { APPS, tintFor, type AppEntry } from "@/lib/data";
 import { APP_ICONS, IconPin } from "./icons";
 import { EASE, Tilt } from "./motion";
 import { loadPins, savePins } from "./pins";
+import { useRole } from "@/lib/roles";
 
 function RailTile({
   app,
@@ -65,6 +66,7 @@ function RailTile({
 export default function AppRail() {
   const [pins, setPins] = useState<string[]>([]);
   const trackRef = useRef<HTMLDivElement>(null);
+  const { canUseApp } = useRole();
 
   useEffect(() => {
     setPins(loadPins());
@@ -80,12 +82,14 @@ export default function AppRail() {
 
   const apps = useMemo(
     () =>
-      [...APPS].sort((a, b) => {
-        const pa = pins.includes(a.id) ? 0 : 1;
-        const pb = pins.includes(b.id) ? 0 : 1;
-        return pa - pb || a.name.localeCompare(b.name);
-      }),
-    [pins],
+      [...APPS]
+        .filter((a) => canUseApp(a.id))
+        .sort((a, b) => {
+          const pa = pins.includes(a.id) ? 0 : 1;
+          const pb = pins.includes(b.id) ? 0 : 1;
+          return pa - pb || a.name.localeCompare(b.name);
+        }),
+    [pins, canUseApp],
   );
 
   const scroll = (dir: 1 | -1) => {

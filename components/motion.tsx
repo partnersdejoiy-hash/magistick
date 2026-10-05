@@ -6,6 +6,7 @@ import {
   useMotionTemplate,
   useMotionValue,
   useReducedMotion,
+  useScroll,
   useSpring,
   useTransform,
 } from "framer-motion";
@@ -170,5 +171,78 @@ export function MaskedWords({ text, className }: { text: string; className?: str
         </span>
       ))}
     </span>
+  );
+}
+
+/**
+ * Magnetic hover — the element leans gently toward the cursor, then springs
+ * back. Subtle; reserved for primary CTAs.
+ */
+export function Magnetic({
+  children,
+  className,
+  strength = 14,
+}: {
+  children: ReactNode;
+  className?: string;
+  strength?: number;
+}) {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 180, damping: 15, mass: 0.25 });
+  const sy = useSpring(y, { stiffness: 180, damping: 15, mass: 0.25 });
+
+  if (reduce) return <div className={className}>{children}</div>;
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      style={{ x: sx, y: sy }}
+      onMouseMove={(e) => {
+        const r = ref.current?.getBoundingClientRect();
+        if (!r) return;
+        x.set(((e.clientX - r.left) / r.width - 0.5) * strength);
+        y.set(((e.clientY - r.top) / r.height - 0.5) * strength);
+      }}
+      onMouseLeave={() => {
+        x.set(0);
+        y.set(0);
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * Scroll-linked parallax — content drifts against the scroll direction.
+ * Pure transform, compositor-friendly.
+ */
+export function Parallax({
+  children,
+  className,
+  amount = 44,
+}: {
+  children: ReactNode;
+  className?: string;
+  amount?: number;
+}) {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [amount, -amount]);
+
+  if (reduce) return <div className={className}>{children}</div>;
+
+  return (
+    <motion.div ref={ref} className={className} style={{ y }}>
+      {children}
+    </motion.div>
   );
 }

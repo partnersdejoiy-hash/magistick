@@ -6,6 +6,7 @@ import { APPS, APP_CATEGORIES, tintFor, type AppEntry } from "@/lib/data";
 import { APP_ICONS, IconArrowRight, IconPin, IconSearch } from "./icons";
 import { EASE } from "./motion";
 import { loadPins, savePins } from "./pins";
+import { useRole } from "@/lib/roles";
 
 function DirectoryRow({
   app,
@@ -83,6 +84,7 @@ export default function AppDirectory({ initialQuery = "" }: { initialQuery?: str
   const [pins, setPins] = useState<string[]>([]);
   const [category, setCategory] = useState<string>("All");
   const [query, setQuery] = useState(initialQuery);
+  const { canUseApp } = useRole();
 
   useEffect(() => {
     setPins(loadPins());
@@ -100,6 +102,7 @@ export default function AppDirectory({ initialQuery = "" }: { initialQuery?: str
     const q = query.trim().toLowerCase();
     const filtered = APPS.filter(
       (a) =>
+        canUseApp(a.id) &&
         (category === "All" || a.category === category) &&
         (!q || a.name.toLowerCase().includes(q) || a.blurb.toLowerCase().includes(q)),
     );
@@ -108,7 +111,7 @@ export default function AppDirectory({ initialQuery = "" }: { initialQuery?: str
       const pb = pins.includes(b.id) ? 0 : 1;
       return pa - pb || a.name.localeCompare(b.name);
     });
-  }, [pins, category, query]);
+  }, [pins, category, query, canUseApp]);
 
   return (
     <section aria-label="App directory">

@@ -2,17 +2,19 @@ import Link from "next/link";
 import AppRail from "@/components/AppRail";
 import UpdatesIndex from "@/components/UpdatesIndex";
 import Hero from "@/components/Hero";
-import { Reveal } from "@/components/motion";
+import StoryJourney from "@/components/StoryJourney";
+import { Magnetic, Parallax, Reveal } from "@/components/motion";
 import { IconArrowRight, IconTicket } from "@/components/icons";
-import { ARTICLES } from "@/lib/data";
 
+/**
+ * Homepage order — apps first, Glowstick-style. The launcher rail sits
+ * immediately under the header; immersive moments follow, never bury.
+ */
 export default function HomePage() {
   return (
     <div className="space-y-20">
-      <Hero />
-
-      {/* ---- app rail ---- */}
-      <section>
+      {/* ---- 1 · apps first ---- */}
+      <section aria-label="Your apps">
         <Reveal>
           <div className="mb-5 flex items-end justify-between">
             <div>
@@ -28,14 +30,27 @@ export default function HomePage() {
         <AppRail />
       </section>
 
-      {/* ---- ticket strip ---- */}
+      {/* ---- 2 · immersive hero with 3D dust ---- */}
+      <Hero />
+
+      {/* ---- 3 · featured stories: pinned horizontal journey ---- */}
+      <StoryJourney />
+
+      {/* ---- 4 · ticket strip ---- */}
       <Reveal>
         <section className="relative overflow-hidden rounded-3xl bg-ink px-7 py-8 text-paper sm:px-10">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-25 blur-3xl"
-            style={{ background: "radial-gradient(closest-side, #D9480F, transparent)" }}
-          />
+          <Parallax amount={60} className="pointer-events-none absolute inset-0">
+            <div
+              aria-hidden
+              className="absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-25 blur-3xl"
+              style={{ background: "radial-gradient(closest-side, #D9480F, transparent)" }}
+            />
+            <div
+              aria-hidden
+              className="absolute -left-16 -bottom-28 h-72 w-72 rounded-full opacity-20 blur-3xl"
+              style={{ background: "radial-gradient(closest-side, #D6A43C, transparent)" }}
+            />
+          </Parallax>
           <div className="relative flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
             <div className="flex items-start gap-4">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ember text-paper">
@@ -48,18 +63,20 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-            <Link
-              href="/help"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-paper px-6 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:bg-ember hover:text-paper active:scale-95"
-            >
-              Open Get Help
-              <IconArrowRight size={15} />
-            </Link>
+            <Magnetic>
+              <Link
+                href="/help"
+                className="inline-flex shrink-0 items-center gap-2 rounded-full bg-paper px-6 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:bg-ember hover:text-paper active:scale-95"
+              >
+                Open Get Help
+                <IconArrowRight size={15} />
+              </Link>
+            </Magnetic>
           </div>
         </section>
       </Reveal>
 
-      {/* ---- updates index ---- */}
+      {/* ---- 5 · updates index ---- */}
       <section>
         <Reveal>
           <div className="mb-2 flex items-end justify-between">
@@ -73,7 +90,7 @@ export default function HomePage() {
             </Link>
           </div>
         </Reveal>
-        <UpdatesIndex articles={ARTICLES} initialVisible={4} step={3} />
+        <UpdatesIndex initialVisible={4} step={3} />
       </section>
     </div>
   );

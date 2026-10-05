@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { usePosts } from "@/lib/posts-store";
 import type { Article } from "@/lib/data";
 import { IconArrowRight } from "./icons";
 import { EASE, Reveal } from "./motion";
@@ -68,16 +69,16 @@ function IndexRow({ article, index }: { article: Article; index: number }) {
 /**
  * Updates as an editorial index — one featured story, then hairline rows.
  * Category filter + View More preserved from the Glowstick pattern.
+ * Reads the live post store so collaborator edits appear instantly.
  */
 export default function UpdatesIndex({
-  articles,
   initialVisible = 6,
   step = 4,
 }: {
-  articles: Article[];
   initialVisible?: number;
   step?: number;
 }) {
+  const { posts: articles } = usePosts();
   const categories = useMemo(
     () => ["All", ...Array.from(new Set(articles.map((a) => a.category)))],
     [articles],

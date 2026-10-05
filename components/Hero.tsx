@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import AmbientField from "./AmbientField";
-import { EASE, MaskedWords } from "./motion";
+import { EASE, Magnetic, MaskedWords } from "./motion";
 import { IconArrowRight } from "./icons";
+
+/** Three.js dust field — lazy, client-only, skipped under reduced motion. */
+const MagicParticles = dynamic(() => import("./MagicParticles"), { ssr: false });
 
 function greeting(): string {
   const h = new Date().getHours();
@@ -26,6 +30,7 @@ export default function Hero() {
   return (
     <section className="relative -mx-5 overflow-hidden px-5 pb-14 pt-8 sm:-mx-8 sm:px-8">
       <AmbientField />
+      <MagicParticles />
       <div className="relative">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -54,15 +59,17 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.58, ease: EASE }}
           className="mt-8 flex flex-wrap items-center gap-5"
         >
-          <motion.div whileTap={{ scale: 0.96 }}>
-            <Link
-              href="/apps"
-              className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition-colors duration-300 hover:bg-ember"
-            >
-              Browse your apps
-              <IconArrowRight size={15} />
-            </Link>
-          </motion.div>
+          <Magnetic>
+            <motion.div whileTap={{ scale: 0.96 }}>
+              <Link
+                href="/apps"
+                className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition-colors duration-300 hover:bg-ember"
+              >
+                Browse your apps
+                <IconArrowRight size={15} />
+              </Link>
+            </motion.div>
+          </Magnetic>
           <Link
             href="/help"
             className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink"

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { useRole } from "@/lib/roles";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -14,12 +15,16 @@ const NAV = [
 
 export default function HeaderNav() {
   const pathname = usePathname();
+  const { can } = useRole();
+  const items = can("manage_roles")
+    ? [...NAV, { href: "/admin", label: "Admin" }]
+    : NAV;
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
 
   return (
     <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
-      {NAV.map((item) => {
+      {items.map((item) => {
         const active = isActive(item.href);
         return (
           <Link

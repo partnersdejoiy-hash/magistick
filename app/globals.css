@@ -79,6 +79,12 @@ body {
   animation: shimmer 1.4s linear infinite;
 }
 
+/* ---- lenis smooth scroll (recommended base styles) ---- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
 /* ---- respect reduced motion: kill ambient + smooth scroll ---- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

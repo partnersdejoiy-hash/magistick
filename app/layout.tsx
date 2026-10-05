@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Space_Grotesk } from "next/font/google";
 import Header from "@/components/Header";
+import ScrollProgress from "@/components/ScrollProgress";
 import Providers from "@/components/Providers";
 import "./globals.css";
 
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Skip to main content
           </a>
           <Header />
+          <ScrollProgress />
           <main id="main" className="mx-auto w-full max-w-6xl px-5 pb-4 pt-10 sm:px-8">
             {children}
           </main>
