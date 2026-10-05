@@ -1,19 +1,32 @@
-import { ARTICLES } from "@/lib/data";
+import { notFound } from "next/navigation";
+import { sql, ensureSchema, rowToPost, type DbPost } from "@/lib/db";
 import ArticleView from "./ArticleView";
-import StubArticleView from "./StubArticleView";
 
-export function generateStaticParams() {
-  return ARTICLES.map((a) => ({ slug: a.slug }));
-}
+export const dynamic = "force-dynamic";
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const idx = ARTICLES.findIndex((a) => a.slug === params.slug);
-  if (idx === -1) {
-    // Not a seed post — may be a stub-created post from Manage posts.
-    return <StubArticleView slug={params.slug} />;
-  }
-  const article = ARTICLES[idx];
-  const prev = ARTICLES[idx - 1];
-  const next = ARTICLES[idx + 1];
-  return <ArticleView article={article} prev={prev} next={next} />;
+/** Single source of truth: posts live in Postgres now. */
+export default async function ArticlePage({ params }: { params: { slug: string } }) {
+  await ensureSchema();
+  const db = sql();
+  const rows = (await db`
+    SELECT id, slug, title, excerpt, category, author, date, body
+    FROM posts WHERE slug = ${params.slug} LIMIT 1
+  `) as Record<string, unknown>[];
+  if (rows.length === 0) notFound();
+  const article: DbPost = rowToPost(rows[0]);
+
+  const all = (await db`
+    SELECT slug, title FROM posts ORDER BY date DESC, created_at DESC
+  `) as { slug: string; title: string }[];
+  const idx = all.findIndex((r) => r.slug === params.slug);
+  const prev = idx > 0 ? all[idx - 1] : undefined;
+  const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : undefined;
+
+  return (
+    <ArticleView
+      article={article}
+      prev={prev ? ({ slug: prev.slug, title: prev.title } as DbPost) : undefined}
+      next={next ? ({ slug: next.slug, title: next.title } as DbPost) : undefined}
+    />
+  );
 }

@@ -1,22 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { SessionUser } from "./auth";
 
 /**
- * Roles & permissions — STUBBED for now.
- *
- * TODO(phase-2 — real auth): replace this whole stub with the session.
- * - getRole() must read the authenticated user's role server-side.
- * - The app-access matrix must be enforced in API routes / middleware.
- * - Client-side gating below is UX convenience only, NOT security.
+ * Roles & capabilities — metadata stays client-side; the actual role now
+ * comes from the server session (useSession), enforced by middleware +
+ * API routes. No more localStorage role stub.
  */
 
 export type RoleId = "admin" | "collaborator" | "employee";
 
 export type Capability =
   | "manage_posts" // create / edit / publish / delete updates
-  | "manage_roles" // edit the roles × apps access matrix
-  | "manage_apps" // (future) manage the app catalog itself
+  | "manage_roles" // edit the roles × apps access matrix + users + apps
+  | "manage_apps" // (same as manage_roles for now)
   | "view_reports"; // (future) workforce reports
 
 export const ROLE_IDS = ["admin", "collaborator", "employee"] as const;
@@ -27,8 +25,8 @@ export const ROLES: Record<
 > = {
   admin: {
     label: "Admin",
-    blurb: "Full control — content, apps, and roles & access.",
-    capabilities: ["manage_posts", "manage_roles", "manage_apps", "view_reports"],
+    blurb: "Full control — content, apps, users, and roles & access.",
+    capabilities: ["manage_posts", "manage_roles", "manage_apps"],
   },
   collaborator: {
     label: "Collaborator",
@@ -49,82 +47,43 @@ export const CAPABILITY_LABELS: Record<Capability, string> = {
   view_reports: "View reports",
 };
 
-/**
- * appId -> roles allowed to USE the app.
- * An absent entry means every role may use the app.
- */
-export type AppAccessMatrix = Record<string, RoleId[]>;
-
-export const DEFAULT_APP_ACCESS: AppAccessMatrix = {
-  // Payroll details stay with admins; quality dashboards with leads.
-  // Everything else is open to all roles until an admin changes it.
-  payroll: ["admin"],
-  quality: ["admin", "collaborator"],
-};
-
-const ROLE_KEY = "magistick:role";
-const MATRIX_KEY = "magistick:app-access";
-
 export function roleCan(role: RoleId, cap: Capability): boolean {
   return ROLES[role].capabilities.includes(cap);
 }
 
-export function appAllowedFor(
-  appId: string,
-  role: RoleId,
-  matrix: AppAccessMatrix,
-): boolean {
-  const allowed = matrix[appId];
-  if (!allowed) return true;
-  return allowed.includes(role);
-}
+/** Live session from the server (httpOnly cookie). Null = signed out. */
+export function useSession() {
+  const [user, setUser] = useState<SessionUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-function read<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function write(key: string, value: unknown) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    /* private mode — preferences just won't persist */
-  }
-}
-
-/**
- * Stub session hook. Default role is "admin" so every surface is visible
- * while real login doesn't exist yet. Use the "View as" switcher in
- * /admin to preview the portal as collaborator or employee.
- */
-export function useRole() {
-  const [role, setRoleState] = useState<RoleId>("admin");
-  const [matrix, setMatrixState] = useState<AppAccessMatrix>(DEFAULT_APP_ACCESS);
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/me", { cache: "no-store" });
+      setUser(res.ok ? ((await res.json()).user as SessionUser) : null);
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    setRoleState(read<RoleId>(ROLE_KEY, "admin"));
-    setMatrixState(read<AppAccessMatrix>(MATRIX_KEY, DEFAULT_APP_ACCESS));
-  }, []);
+    refresh();
+  }, [refresh]);
 
-  const setRole = useCallback((r: RoleId) => {
-    setRoleState(r);
-    write(ROLE_KEY, r);
-  }, []);
-
-  const setMatrix = useCallback((m: AppAccessMatrix) => {
-    setMatrixState(m);
-    write(MATRIX_KEY, m);
-  }, []);
-
-  const can = useCallback((cap: Capability) => roleCan(role, cap), [role]);
-  const canUseApp = useCallback(
-    (appId: string) => appAllowedFor(appId, role, matrix),
-    [role, matrix],
+  const can = useCallback(
+    (cap: Capability) => (user ? roleCan(user.role, cap) : false),
+    [user],
   );
 
-  return { role, setRole, matrix, setMatrix, can, canUseApp };
+  const signOut = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      /* cookie clear is best-effort */
+    }
+    window.location.href = "/login";
+  }, []);
+
+  return { user, loading, can, refresh, signOut };
 }

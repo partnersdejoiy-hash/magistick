@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { useRole } from "@/lib/roles";
-import { usePosts, type PostInput } from "@/lib/posts-store";
-import { ARTICLES } from "@/lib/data";
+import { useCallback, useEffect, useState } from "react";
+import { useSession } from "@/lib/roles";
+import type { PostInput } from "@/lib/db";
 import { Reveal } from "@/components/motion";
 import NotAllowed from "@/components/NotAllowed";
 import { IconArrowLeft, IconArrowRight, IconPlus } from "@/components/icons";
+
+type Post = PostInput & { id: string; slug: string };
 
 const inputCls =
   "w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm text-ink placeholder:text-stone-400 focus:border-ember focus:outline-none";
@@ -60,12 +61,7 @@ function PostEditor({
         </label>
         <label>
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">Category</span>
-          <input className={inputCls} value={form.category} onChange={(e) => set("category", e.target.value)} list="post-categories" />
-          <datalist id="post-categories">
-            {Array.from(new Set(ARTICLES.map((a) => a.category))).map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
+          <input className={inputCls} value={form.category} onChange={(e) => set("category", e.target.value)} placeholder="Announcements" />
         </label>
         <label>
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">Author</span>
@@ -116,12 +112,51 @@ function PostEditor({
 }
 
 export default function ManagePostsPage() {
-  const { can } = useRole();
-  const { posts, createPost, updatePost, deletePost } = usePosts();
-  const [editing, setEditing] = useState<{ slug: string | null; input: PostInput } | null>(null);
+  const { can } = useSession();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [editing, setEditing] = useState<{ id: string | null; input: PostInput } | null>(null);
   const [savedSlug, setSavedSlug] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  const seedSlugs = useMemo(() => new Set(ARTICLES.map((a) => a.slug)), []);
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/posts", { cache: "no-store" });
+      if (res.ok) setPosts(((await res.json()).posts ?? []) as Post[]);
+    } catch {
+      /* keep list as-is */
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const save = async (input: PostInput) => {
+    setError("");
+    const isEdit = !!editing?.id;
+    const res = await fetch(
+      isEdit ? `/api/admin/posts/${editing!.id}` : "/api/admin/posts",
+      {
+        method: isEdit ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      },
+    );
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(data.error || "Couldn't save the post.");
+      return;
+    }
+    setSavedSlug((data.post as Post).slug);
+    setEditing(null);
+    load();
+  };
+
+  const remove = async (p: Post) => {
+    if (!window.confirm(`Delete "${p.title}"? This can't be undone.`)) return;
+    await fetch(`/api/admin/posts/${p.id}`, { method: "DELETE" });
+    load();
+  };
 
   if (!can("manage_posts")) return <NotAllowed what="Manage posts" />;
 
@@ -136,14 +171,13 @@ export default function ManagePostsPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-400">Admin</p>
             <h1 className="mt-1 font-display text-[34px] font-semibold tracking-tight text-ink">Manage posts</h1>
             <p className="mt-2 max-w-xl text-[14.5px] text-stone-600">
-              Collaborators and admins can publish straight to the bulletin. Seed posts ship with the
-              portal; your edits are stubbed in this browser until phase 2.
+              Collaborators and admins publish straight to the bulletin — live for everyone, instantly.
             </p>
           </div>
           {!editing && (
             <button
               type="button"
-              onClick={() => { setEditing({ slug: null, input: emptyInput() }); setSavedSlug(null); }}
+              onClick={() => { setEditing({ id: null, input: emptyInput() }); setSavedSlug(null); }}
               className="inline-flex items-center gap-2 rounded-full bg-ember px-6 py-2.5 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember-deep active:scale-95"
             >
               <IconPlus size={15} /> New post
@@ -151,6 +185,12 @@ export default function ManagePostsPage() {
           )}
         </div>
       </Reveal>
+
+      {error && (
+        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-[13px] font-medium text-red-700">
+          {error}
+        </p>
+      )}
 
       {savedSlug && !editing && (
         <div className="flex items-center justify-between rounded-2xl border border-ember/30 bg-ember-tint/60 px-5 py-3.5">
@@ -164,36 +204,26 @@ export default function ManagePostsPage() {
       {editing && (
         <PostEditor
           initial={editing.input}
-          editingSlug={editing.slug}
+          editingSlug={editing.id}
           onCancel={() => setEditing(null)}
-          onSave={(input) => {
-            if (editing.slug) {
-              updatePost(editing.slug, input);
-              setSavedSlug(editing.slug);
-            } else {
-              const created = createPost(input);
-              setSavedSlug(created.slug);
-            }
-            setEditing(null);
-          }}
+          onSave={save}
         />
       )}
 
       <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white/70">
         {posts.map((p) => (
-          <li key={p.slug} className="flex items-center gap-4 px-5 py-4">
+          <li key={p.id} className="flex items-center gap-4 px-5 py-4">
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-[16px] font-semibold text-ink">{p.title}</p>
               <p className="mt-0.5 text-xs text-stone-400">
                 {p.category} · {formatDate(p.date)} · {p.author}
-                {!seedSlugs.has(p.slug) && <span className="ml-2 rounded-full bg-ember-tint px-2 py-0.5 font-semibold text-ember-ink">new</span>}
               </p>
             </div>
             <button
               type="button"
               onClick={() => {
                 setEditing({
-                  slug: p.slug,
+                  id: p.id,
                   input: { title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, body: p.body },
                 });
                 setSavedSlug(null);
@@ -205,9 +235,7 @@ export default function ManagePostsPage() {
             </button>
             <button
               type="button"
-              onClick={() => {
-                if (window.confirm(`Delete "${p.title}"? This can't be undone.`)) deletePost(p.slug);
-              }}
+              onClick={() => remove(p)}
               className="rounded-full border border-line px-4 py-1.5 text-[13px] font-semibold text-stone-500 transition-colors hover:border-red-300 hover:text-red-600"
             >
               Delete

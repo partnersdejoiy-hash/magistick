@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRole } from "@/lib/roles";
+import { useSession } from "@/lib/roles";
 import { IconPlus } from "@/components/icons";
 
 /** "Manage posts" entry — visible only to roles with the capability. */
 export default function ManagePostsLink() {
-  const { can } = useRole();
+  const { can } = useSession();
   if (!can("manage_posts")) return null;
   return (
     <Link

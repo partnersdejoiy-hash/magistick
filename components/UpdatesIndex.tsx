@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { usePosts } from "@/lib/posts-store";
 import type { Article } from "@/lib/data";
 import { IconArrowRight } from "./icons";
 import { EASE, Reveal } from "./motion";
@@ -78,7 +77,13 @@ export default function UpdatesIndex({
   initialVisible?: number;
   step?: number;
 }) {
-  const { posts: articles } = usePosts();
+  const [articles, setArticles] = useState<Article[]>([]);
+  useEffect(() => {
+    fetch("/api/posts", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { posts: [] }))
+      .then((d) => setArticles(Array.isArray(d.posts) ? d.posts : []))
+      .catch(() => setArticles([]));
+  }, []);
   const categories = useMemo(
     () => ["All", ...Array.from(new Set(articles.map((a) => a.category)))],
     [articles],

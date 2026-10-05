@@ -2,22 +2,25 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { APPS, APP_CATEGORIES, tintFor, type AppEntry } from "@/lib/data";
 import { APP_ICONS, IconArrowRight, IconPin, IconSearch } from "./icons";
 import { EASE } from "./motion";
 import { loadPins, savePins } from "./pins";
-import { useRole } from "@/lib/roles";
+import type { RailApp } from "./AppRail";
+
+function iconFor(key: string) {
+  return (APP_ICONS as Record<string, (p: { size?: number }) => JSX.Element>)[key] ?? APP_ICONS.globe;
+}
 
 function DirectoryRow({
   app,
   pinned,
   onTogglePin,
 }: {
-  app: AppEntry;
+  app: RailApp;
   pinned: boolean;
   onTogglePin: () => void;
 }) {
-  const Icon = APP_ICONS[app.icon];
+  const Icon = iconFor(app.icon);
   return (
     <motion.li
       layout
@@ -29,10 +32,15 @@ function DirectoryRow({
     >
       <a
         href={app.href}
+        target="_blank"
+        rel="noopener noreferrer"
         className="flex items-center gap-4 border-b border-line px-2 py-4 transition-colors duration-200 hover:bg-parchment/60 sm:px-4"
         aria-label={`${app.name} — ${app.blurb}`}
       >
-        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tintFor(app.category)} transition-transform duration-300 group-hover:scale-105`}>
+        <span
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white transition-transform duration-300 group-hover:scale-105"
+          style={{ backgroundColor: app.color }}
+        >
           <Icon size={20} />
         </span>
         <span className="min-w-0 flex-1">
@@ -79,16 +87,26 @@ function DirectoryRow({
 /**
  * App directory — editorial index rows instead of a card grid:
  * hairline dividers, refined search, category pills, pin-to-top.
+ * Apps are role-filtered by the server.
  */
 export default function AppDirectory({ initialQuery = "" }: { initialQuery?: string }) {
   const [pins, setPins] = useState<string[]>([]);
+  const [allApps, setAllApps] = useState<RailApp[]>([]);
   const [category, setCategory] = useState<string>("All");
   const [query, setQuery] = useState(initialQuery);
-  const { canUseApp } = useRole();
 
   useEffect(() => {
     setPins(loadPins());
+    fetch("/api/apps", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { apps: [] }))
+      .then((d) => setAllApps(Array.isArray(d.apps) ? d.apps : []))
+      .catch(() => setAllApps([]));
   }, []);
+
+  const categories = useMemo(
+    () => ["All", ...Array.from(new Set(allApps.map((a) => a.category)))],
+    [allApps],
+  );
 
   const togglePin = (id: string) => {
     setPins((prev) => {
@@ -100,9 +118,8 @@ export default function AppDirectory({ initialQuery = "" }: { initialQuery?: str
 
   const apps = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const filtered = APPS.filter(
+    const filtered = allApps.filter(
       (a) =>
-        canUseApp(a.id) &&
         (category === "All" || a.category === category) &&
         (!q || a.name.toLowerCase().includes(q) || a.blurb.toLowerCase().includes(q)),
     );
@@ -111,7 +128,7 @@ export default function AppDirectory({ initialQuery = "" }: { initialQuery?: str
       const pb = pins.includes(b.id) ? 0 : 1;
       return pa - pb || a.name.localeCompare(b.name);
     });
-  }, [pins, category, query, canUseApp]);
+  }, [allApps, pins, category, query]);
 
   return (
     <section aria-label="App directory">
@@ -127,7 +144,7 @@ export default function AppDirectory({ initialQuery = "" }: { initialQuery?: str
           />
         </div>
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="App categories">
-          {APP_CATEGORIES.map((c) => {
+          {categories.map((c) => {
             const active = category === c;
             return (
               <button

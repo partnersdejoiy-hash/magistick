@@ -158,6 +158,14 @@ export const IconTicket = (p: P) => (
   </Base>
 );
 
+export const IconGlobe = (p: P) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M3.5 12h17" />
+    <path d="M12 3.5c2.6 2.4 3.9 5.3 3.9 8.5s-1.3 6.1-3.9 8.5c-2.6-2.4-3.9-5.3-3.9-8.5S9.4 5.9 12 3.5Z" />
+  </Base>
+);
+
 export const IconPlus = (p: P) => (
   <Base {...p}>
     <path d="M12 5v14M5 12h14" />
@@ -220,6 +228,8 @@ export const APP_ICONS = {
   plane: IconPlane,
   userplus: IconUserPlus,
   gauge: IconGauge,
+  ticket: IconTicket,
+  globe: IconGlobe,
 } as const;
 
 export type AppIconKey = keyof typeof APP_ICONS;

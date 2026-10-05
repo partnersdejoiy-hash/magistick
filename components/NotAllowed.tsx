@@ -3,8 +3,8 @@ import { Reveal } from "@/components/motion";
 import { IconArrowLeft } from "@/components/icons";
 
 /**
- * Shown when the stubbed role lacks the capability for an admin surface.
- * TODO(phase-2): replace with a server-side 403 via real session auth.
+ * Shown when the signed-in role lacks the capability for an admin surface.
+ * Middleware + API routes enforce this server-side; this is the UI fallback.
  */
 export default function NotAllowed({ what = "this area" }: { what?: string }) {
   return (
@@ -18,8 +18,7 @@ export default function NotAllowed({ what = "this area" }: { what?: string }) {
         </h1>
         <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-stone-500">
           Your current role doesn't include this capability. Ask an admin to
-          grant it, or switch roles in <span className="font-medium text-ink">Admin → Roles &amp; access</span> to
-          preview the portal as another role.
+          change your role in <span className="font-medium text-ink">Admin → Team</span>.
         </p>
         <Link
           href="/"

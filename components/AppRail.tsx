@@ -2,22 +2,35 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { APPS, tintFor, type AppEntry } from "@/lib/data";
-import { APP_ICONS, IconPin } from "./icons";
+import { APP_ICONS } from "./icons";
+import { IconPin } from "./icons";
 import { EASE, Tilt } from "./motion";
 import { loadPins, savePins } from "./pins";
-import { useRole } from "@/lib/roles";
+
+export type RailApp = {
+  id: string;
+  name: string;
+  blurb: string;
+  category: string;
+  href: string;
+  icon: string;
+  color: string;
+};
+
+function iconFor(key: string) {
+  return (APP_ICONS as Record<string, (p: { size?: number }) => JSX.Element>)[key] ?? APP_ICONS.globe;
+}
 
 function RailTile({
   app,
   pinned,
   onTogglePin,
 }: {
-  app: AppEntry;
+  app: RailApp;
   pinned: boolean;
   onTogglePin: () => void;
 }) {
-  const Icon = APP_ICONS[app.icon];
+  const Icon = iconFor(app.icon);
   return (
     <Tilt className="h-full w-full" max={8}>
       <div className="group relative h-full rounded-2xl border border-line bg-white/80 p-4 shadow-card backdrop-blur transition-shadow duration-300 hover:shadow-lift">
@@ -38,9 +51,16 @@ function RailTile({
         >
           <IconPin size={14} />
         </button>
-        <a href={app.href} className="block" aria-label={`${app.name} — ${app.blurb}`}>
+        <a
+          href={app.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+          aria-label={`${app.name} — ${app.blurb}`}
+        >
           <span
-            className={`flex h-11 w-11 items-center justify-center rounded-xl ${tintFor(app.category)} transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}
+            className="flex h-11 w-11 items-center justify-center rounded-xl text-white transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
+            style={{ backgroundColor: app.color }}
           >
             <Icon size={20} />
           </span>
@@ -61,15 +81,20 @@ function RailTile({
 
 /**
  * The app rail — Glowstick's launcher pattern, rebuilt with physics:
- * 3D tilt + cursor highlight on tiles, staggered entrance, smooth arrows.
+ * role-filtered from the server, 3D tilt + cursor highlight on tiles,
+ * staggered entrance, smooth arrows.
  */
 export default function AppRail() {
   const [pins, setPins] = useState<string[]>([]);
+  const [apps, setApps] = useState<RailApp[]>([]);
   const trackRef = useRef<HTMLDivElement>(null);
-  const { canUseApp } = useRole();
 
   useEffect(() => {
     setPins(loadPins());
+    fetch("/api/apps", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { apps: [] }))
+      .then((d) => setApps(Array.isArray(d.apps) ? d.apps : []))
+      .catch(() => setApps([]));
   }, []);
 
   const togglePin = (id: string) => {
@@ -80,16 +105,14 @@ export default function AppRail() {
     });
   };
 
-  const apps = useMemo(
+  const ordered = useMemo(
     () =>
-      [...APPS]
-        .filter((a) => canUseApp(a.id))
-        .sort((a, b) => {
-          const pa = pins.includes(a.id) ? 0 : 1;
-          const pb = pins.includes(b.id) ? 0 : 1;
-          return pa - pb || a.name.localeCompare(b.name);
-        }),
-    [pins, canUseApp],
+      [...apps].sort((a, b) => {
+        const pa = pins.includes(a.id) ? 0 : 1;
+        const pb = pins.includes(b.id) ? 0 : 1;
+        return pa - pb || a.name.localeCompare(b.name);
+      }),
+    [apps, pins],
   );
 
   const scroll = (dir: 1 | -1) => {
@@ -115,7 +138,7 @@ export default function AppRail() {
       el.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, [apps.length]);
+  }, [ordered.length]);
 
   const Arrow = ({
     dir,
@@ -160,7 +183,7 @@ export default function AppRail() {
         viewport={{ once: true, margin: "-40px" }}
         variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
       >
-        {apps.map((app) => (
+        {ordered.map((app) => (
           <motion.div
             key={app.id}
             className="w-40 shrink-0 snap-start"

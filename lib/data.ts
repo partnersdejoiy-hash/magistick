@@ -1,52 +1,10 @@
-import type { AppIconKey } from "@/components/icons";
-
-export type AppEntry = {
-  id: string;
-  name: string;
-  blurb: string;
-  category: string;
-  href: string;
-  /** key into APP_ICONS in components/icons.tsx */
-  icon: AppIconKey;
-};
-
-export const APP_CATEGORIES = [
-  "All",
-  "People & HR",
-  "Pay & Time",
-  "Learning",
-  "IT & Tools",
-  "Culture",
-] as const;
-
-/** BPO app catalog. Real SSO links replace hrefs in phase 2. */
-export const APPS: AppEntry[] = [
-  { id: "hrms", name: "PeopleHub", blurb: "Profiles, documents & the org chart", category: "People & HR", href: "#", icon: "people" },
-  { id: "attendance", name: "TimeTrack", blurb: "Shifts, attendance & time-off requests", category: "Pay & Time", href: "#", icon: "clock" },
-  { id: "payroll", name: "PaySlip", blurb: "Payslips, tax forms & reimbursements", category: "Pay & Time", href: "#", icon: "wallet" },
-  { id: "learning", name: "SkillUp", blurb: "Onboarding paths & the training library", category: "Learning", href: "#", icon: "book" },
-  { id: "it", name: "FixIt", blurb: "Report device, network & access issues", category: "IT & Tools", href: "#", icon: "wrench" },
-  { id: "chat", name: "TeamChat", blurb: "Team messaging & channels", category: "IT & Tools", href: "#", icon: "chat" },
-  { id: "meet", name: "MeetUp", blurb: "Video meetings & daily huddles", category: "IT & Tools", href: "#", icon: "video" },
-  { id: "rewards", name: "Shine", blurb: "Recognize teammates & nominations", category: "Culture", href: "#", icon: "award" },
-  { id: "ideas", name: "BrightIdeas", blurb: "Suggest process improvements", category: "Culture", href: "#", icon: "bulb" },
-  { id: "travel", name: "GoFar", blurb: "Travel bookings & expense claims", category: "People & HR", href: "#", icon: "plane" },
-  { id: "refer", name: "ReferWin", blurb: "Refer candidates, earn bonuses", category: "People & HR", href: "#", icon: "userplus" },
-  { id: "quality", name: "QualityLens", blurb: "Audit scores & quality dashboards", category: "IT & Tools", href: "#", icon: "gauge" },
-];
-
-/** Restrained duotone chip per category — ink icon on a soft warm tint. */
-export const CATEGORY_TINT: Record<string, string> = {
-  "People & HR": "bg-rose-100 text-rose-900",
-  "Pay & Time": "bg-emerald-100 text-emerald-900",
-  Learning: "bg-amber-100 text-amber-900",
-  "IT & Tools": "bg-sky-100 text-sky-900",
-  Culture: "bg-orange-100 text-orange-900",
-};
-
-export function tintFor(category: string): string {
-  return CATEGORY_TINT[category] ?? "bg-stone-200 text-stone-800";
-}
+/**
+ * Seed content for magistick.
+ *
+ * ARTICLES seeds the bulletin posts table on first boot (lib/db.ts).
+ * PEOPLE is the static directory sample until the HR sync lands.
+ * The app catalog lives in Postgres now (admin-managed) — see /api/apps.
+ */
 
 export type Article = {
   slug: string;
@@ -69,7 +27,7 @@ export const ARTICLES: Article[] = [
     body: [
       "Until today, getting work done meant keeping a dozen bookmarks, asking in three different chat groups where the leave form lives, and losing tickets in email threads. magistick replaces all of that with one front door: your apps, your support tickets, and every company update live here, in one calm place.",
       "Three things worth doing on day one. First, open the app rail below and pin the tools you touch every day — pinned apps stay at the top on every visit. Second, visit Get Help and skim how ticketing works; the day something breaks, you'll already know where to go. Third, check the bulletin below whenever you want the pulse of the company — that's where announcements, IT notices, and workforce news will land from now on.",
-      "A note on honesty: this portal is brand new, and the app tiles currently open placeholder links while we wire up single sign-on for each tool. Don't be alarmed — your real logins aren't going anywhere, and we'll announce each app as its SSO goes live.",
+      "A note on honesty: this portal is brand new, and the launcher starts with our first two real apps — Chronix and OrbitDesk — each opening in a new tab with your usual login for that tool. More apps join the rail as we wire them up, and we'll announce each one here in the bulletin.",
       "This is your portal as much as ours. If something's missing, confusing, or just plain ugly, raise a general ticket from Get Help — every suggestion lands directly with the team building magistick, and we read all of them.",
     ],
   },
@@ -109,10 +67,10 @@ export const ARTICLES: Article[] = [
     author: "WFM Team",
     date: "2026-10-03",
     body: [
-      "October is our busiest rostering month, so here's everything in one place. Shift swap requests need a full 48 hours' notice through TimeTrack — swaps requested inside that window will be declined automatically, no exceptions, because the floor plan is already printed.",
-      "Leave balances refreshed on the 1st. If your balance looks wrong, check PaySlip first — most 'missing leave' reports turn out to be the new carry-forward cap. If it still looks off after that, raise a General ticket from Get Help with a screenshot and we'll reconcile it within two working days.",
+      "October is our busiest rostering month, so here's everything in one place. Shift swap requests need a full 48 hours' notice through the attendance tool — swaps requested inside that window will be declined automatically, no exceptions, because the floor plan is already printed.",
+      "Leave balances refreshed on the 1st. If your balance looks wrong, check your payslip first — most 'missing leave' reports turn out to be the new carry-forward cap. If it still looks off after that, raise a General ticket from Get Help with a screenshot and we'll reconcile it within two working days.",
       "The big one: festival-season rosters lock on the 20th of October. After lock, changes need your team lead's written approval plus WFM sign-off, and honest advice — get your requests in by the 18th. Talk to your team lead this week if you have travel planned.",
-      "Overtime this month is pre-approved for the night batch only. If you're on day shift and staying late, log it in TimeTrack the same day; backdated overtime entries need manager approval and slow down your payout.",
+      "Overtime this month is pre-approved for the night batch only. If you're on day shift and staying late, log it in the attendance tool the same day; backdated overtime entries need manager approval and slow down your payout.",
     ],
   },
   {
@@ -124,7 +82,7 @@ export const ARTICLES: Article[] = [
     date: "2026-10-02",
     body: [
       "The app rail on the home page is yours to arrange. Hover any tile and hit the pin — pinned apps jump to the front of the rail and stay there on every visit, on every device. Unpin just as easily. Most people end up with four or five daily drivers pinned and the rest a scroll away, which is exactly the point: your morning starts with one glance, not a bookmark folder.",
-      "Looking for something specific? The Apps page is the full directory — search by name or filter by category: People & HR, Pay & Time, Learning, IT & Tools, Culture. Every tile shows what the tool is actually for, so you're not guessing from cryptic names.",
+      "Looking for something specific? The Apps page is the full directory — search by name or filter by category. Every tile shows what the tool is actually for, so you're not guessing from cryptic names.",
       "Need an app that isn't there? Raise a General ticket from Get Help with three things: the app's name, its login URL, and who needs access. We'll verify the license, wire up single sign-on where the vendor supports it, and add the tile. Most requests take about a week end to end.",
       "One security note while we're here: never paste passwords into a ticket, a post, or chat. If IT needs credentials for a fix, they'll ask through the proper channel — anyone asking for your password in a ticket thread isn't IT.",
     ],

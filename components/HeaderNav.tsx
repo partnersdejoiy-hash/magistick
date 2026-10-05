@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { useRole } from "@/lib/roles";
+import { useSession } from "@/lib/roles";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -15,7 +15,7 @@ const NAV = [
 
 export default function HeaderNav() {
   const pathname = usePathname();
-  const { can } = useRole();
+  const { can } = useSession();
   const items = can("manage_roles")
     ? [...NAV, { href: "/admin", label: "Admin" }]
     : NAV;
