@@ -8,8 +8,11 @@ Inspired by TaskUs Glowstick, built to beat it.
 - **Home** — personalized greeting, pinnable app launcher, latest updates
 - **Apps** — searchable, categorized app directory with pin-to-top (localStorage)
 - **Updates** — article feed + article pages (author + date shown)
-- **Get Help** — My Tickets: raise + track OrbitDesk tickets **inline** via a
-  server-side proxy (`/api/orbitdesk/*`) — no new tab, no OrbitDesk code changes
+- **Get Help** — two paths: (1) **General tickets** (HR, payroll, WFM…) — raise +
+  track OrbitDesk tickets **inline** via a server-side proxy (`/api/orbitdesk/*`) —
+  no new tab, no OrbitDesk code changes; (2) **Submit IT Ticket** button opening
+  the dedicated IT tool in a new tab (Glowstick's ServiceNow pattern; placeholder
+  link until that tool is built)
 - **Directory** — people search placeholder
 
 ## Run locally

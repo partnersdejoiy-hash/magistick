@@ -90,3 +90,10 @@ export const PEOPLE: Person[] = [
   { name: "Sana Iqbal", role: "Quality Analyst", team: "Quality", site: "Remote" },
   { name: "Rohan Verma", role: "IT Support", team: "IT", site: "Gurugram" },
 ];
+
+/**
+ * External IT help-desk tool (ServiceNow-like). Built separately later —
+ * magistick keeps Glowstick's pattern: a "Submit IT Ticket" button that opens
+ * the external tool in a new tab. "#" until the tool exists.
+ */
+export const IT_HELPDESK_URL = "#";

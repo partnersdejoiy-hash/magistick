@@ -3,6 +3,12 @@
 Investigated 2026-10-05 (read-only) against repo `partnersdejoiy-hash/Enterprise-Ticketing`,
 branch `codex/bpo-intake-and-team-access`. **No OrbitDesk code, config, or data was modified.**
 
+**Scope (per Deepak, 2026-10-05):** the OrbitDesk INLINE interlink covers GENERAL
+tickets only (HR, payroll, WFM, facilities…). IT tickets keep Glowstick's exact
+pattern — a "Submit IT Ticket" button that opens the dedicated IT tool
+(ServiceNow-like, built separately later) in a new tab. The /help page therefore
+has TWO paths: (1) OrbitDesk-inline general tickets, (2) external IT-tool button.
+
 ## What OrbitDesk exposes (public, documented API)
 
 - Base URL: `https://orbitdesk.dejoiy.com` — Vercel serverless function (`api/index.ts`)
