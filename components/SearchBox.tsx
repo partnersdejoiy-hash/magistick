@@ -26,7 +26,7 @@ export default function SearchBox() {
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search apps…"
         aria-label="Search apps"
-        className="w-52 rounded-full border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-[13px] text-paper placeholder:text-stone-500 transition-all duration-300 focus:w-64 focus:border-ember/60 focus:bg-white/[0.07] focus:outline-none"
+        className="w-56 rounded-full border border-white/10 bg-white/5 py-2 pl-9 pr-4 text-[13px] text-paper placeholder:text-stone-500 transition-all duration-300 focus:w-64 focus:border-ember/60 focus:bg-white/[0.07] focus:outline-none"
       />
     </form>
   );

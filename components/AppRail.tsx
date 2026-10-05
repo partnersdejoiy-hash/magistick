@@ -96,14 +96,51 @@ export default function AppRail() {
     trackRef.current?.scrollBy({ left: dir * 380, behavior: "smooth" });
   };
 
-  const Arrow = ({ dir, label }: { dir: 1 | -1; label: string }) => (
+  // Directional arrow visibility: only show an arrow when there is actually
+  // more content in that direction. Prevents arrows overlapping edge cards.
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const update = () => {
+      setCanLeft(el.scrollLeft > 8);
+      setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 8);
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [apps.length]);
+
+  const Arrow = ({
+    dir,
+    label,
+    visible,
+  }: {
+    dir: 1 | -1;
+    label: string;
+    visible: boolean;
+  }) => (
     <motion.button
       type="button"
       whileTap={{ scale: 0.88 }}
       onClick={() => scroll(dir)}
       aria-label={label}
-      className="absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-paper/90 text-ink shadow-card backdrop-blur transition-colors hover:border-ember/40 hover:text-ember md:flex"
-      style={dir === 1 ? { right: -16 } : { left: -16 }}
+      aria-hidden={!visible}
+      tabIndex={visible ? 0 : -1}
+      initial={false}
+      animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 0.85 }}
+      transition={{ duration: 0.25, ease: EASE }}
+      className="absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-paper/95 text-ink shadow-card backdrop-blur transition-colors hover:border-ember/40 hover:text-ember md:flex"
+      style={{
+        ...(dir === 1 ? { right: 6 } : { left: 6 }),
+        pointerEvents: visible ? "auto" : "none",
+      }}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         {dir === 1 ? <path d="M9 6l6 6-6 6" /> : <path d="M15 6l-6 6 6 6" />}
@@ -112,7 +149,8 @@ export default function AppRail() {
   );
 
   return (
-    <div className="relative">
+    // md:px-12 reserves gutters so the floating arrows never overlap edge cards
+    <div className="relative px-1 md:px-12">
       <motion.div
         ref={trackRef}
         className="no-scrollbar flex snap-x gap-3.5 overflow-x-auto px-1 py-2"
@@ -135,8 +173,8 @@ export default function AppRail() {
           </motion.div>
         ))}
       </motion.div>
-      <Arrow dir={-1} label="Scroll apps left" />
-      <Arrow dir={1} label="Scroll apps right" />
+      <Arrow dir={-1} label="Scroll apps left" visible={canLeft} />
+      <Arrow dir={1} label="Scroll apps right" visible={canRight} />
     </div>
   );
 }
