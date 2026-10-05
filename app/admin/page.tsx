@@ -152,7 +152,7 @@ function TeamSection({ me }: { me: { id: string } | null }) {
                     <button
                       type="button"
                       onClick={() => { setResetFor(u); setNewPw(""); setError(""); }}
-                      className="rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold text-stone-500 transition-colors hover:border-ember/50 hover:text-ember"
+                      className="rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold text-stone-500 transition-colors hover:border-magenta/50 hover:text-magenta"
                     >
                       Reset password
                     </button>
@@ -174,7 +174,7 @@ function TeamSection({ me }: { me: { id: string } | null }) {
       </div>
 
       {resetFor && (
-        <div className="mt-4 rounded-2xl border border-ember/40 bg-white/80 p-5">
+        <div className="mt-4 rounded-2xl border border-magenta/40 bg-white/80 p-5">
           <p className="text-sm font-semibold text-ink">Reset password for {resetFor.name}</p>
           <div className="mt-3 flex flex-wrap gap-3">
             <input
@@ -187,7 +187,7 @@ function TeamSection({ me }: { me: { id: string } | null }) {
             <button
               type="button"
               onClick={resetPassword}
-              className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember"
+              className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember hover:text-ink"
             >
               Set password
             </button>
@@ -221,7 +221,7 @@ function TeamSection({ me }: { me: { id: string } | null }) {
         </div>
         <button
           type="submit"
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember active:scale-95"
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember hover:text-ink active:scale-95"
         >
           <IconPlus size={15} /> Add member
         </button>
@@ -299,10 +299,12 @@ function MatrixSection() {
                   <td className="px-5 py-3">
                     <span className="flex items-center gap-3">
                       <span
-                        className="flex h-9 w-9 items-center justify-center rounded-xl text-white"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl"
                         style={{ backgroundColor: app.color }}
                       >
-                        <Icon size={17} />
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white" style={{ color: app.color }}>
+                          <Icon size={13} />
+                        </span>
                       </span>
                       <span>
                         <span className="block text-sm font-semibold text-ink">{app.name}</span>
@@ -322,7 +324,7 @@ function MatrixSection() {
                           onClick={() => toggle(app.id, r)}
                           className={`inline-flex h-7 w-7 items-center justify-center rounded-lg border transition-all duration-200 ${
                             on
-                              ? "border-ember bg-ember text-paper"
+                              ? "border-ember bg-ember text-ink"
                               : "border-line bg-paper text-transparent hover:border-stone-300"
                           }`}
                         >
@@ -344,7 +346,7 @@ function MatrixSection() {
 /* ---------------- Apps manager ---------------- */
 
 const ICON_CHOICES = ["clock", "ticket", "globe", "people", "wallet", "book", "wrench", "chat", "video", "award", "bulb", "plane", "userplus", "gauge"];
-const COLOR_CHOICES = ["#2563EB", "#D9480F", "#059669", "#7C3AED", "#DB2777", "#0891B2", "#CA8A04", "#DC2626"];
+const COLOR_CHOICES = ["#2563EB", "#00ACC1", "#FFC400", "#E91E63", "#7C3AED", "#059669", "#EA580C", "#DC2626"];
 
 function AppsSection({ onChanged }: { onChanged: () => void }) {
   const [apps, setApps] = useState<App[]>([]);
@@ -403,10 +405,12 @@ function AppsSection({ onChanged }: { onChanged: () => void }) {
           return (
             <li key={a.id} className="flex items-center gap-4 px-5 py-3.5">
               <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
                 style={{ backgroundColor: a.color }}
               >
-                <Icon size={18} />
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white" style={{ color: a.color }}>
+                  <Icon size={15} />
+                </span>
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold text-ink">{a.name}</span>
@@ -476,7 +480,7 @@ function AppsSection({ onChanged }: { onChanged: () => void }) {
         </div>
         <button
           type="submit"
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember active:scale-95"
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember hover:text-ink active:scale-95"
         >
           <IconPlus size={15} /> Add app
         </button>
@@ -547,7 +551,7 @@ export default function AdminPage() {
       <Reveal>
         <Link
           href="/admin/posts"
-          className="group flex items-center justify-between rounded-2xl border border-line bg-white/70 px-6 py-5 transition-all duration-300 hover:border-ember/50 hover:shadow-lift"
+          className="group flex items-center justify-between rounded-2xl border border-line bg-white/70 px-6 py-5 transition-all duration-300 hover:border-magenta/50 hover:shadow-lift"
         >
           <span>
             <span className="block font-display text-lg font-semibold text-ink">Manage posts</span>
@@ -555,7 +559,7 @@ export default function AdminPage() {
               Create, edit and publish bulletin updates — collaborator capability.
             </span>
           </span>
-          <IconArrowRight size={18} className="text-stone-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-ember" />
+          <IconArrowRight size={18} className="text-stone-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-magenta" />
         </Link>
       </Reveal>
     </div>

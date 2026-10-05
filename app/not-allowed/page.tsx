@@ -8,7 +8,7 @@ export default function NotAllowedPage() {
     <div className="py-10">
       <NotAllowed what="this area" />
       <p className="mt-6 text-center">
-        <Link href="/" className="text-sm font-semibold text-ember hover:text-ember-deep">
+        <Link href="/" className="text-sm font-semibold text-magenta hover:text-magenta-deep">
           ← Back to home
         </Link>
       </p>

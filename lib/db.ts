@@ -81,7 +81,7 @@ const SEED_APPS = [
     category: "Support",
     href: "https://orbitdesk.dejoiy.com",
     icon: "ticket",
-    color: "#D9480F",
+    color: "#7C3AED",
     sort_order: 2,
   },
 ];

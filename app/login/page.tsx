@@ -51,7 +51,7 @@ function LoginForm() {
         className="w-full max-w-sm"
       >
         <div className="mb-8 text-center">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-ember font-display text-3xl font-bold italic text-paper shadow-[0_8px_24px_-8px_rgba(217,72,15,0.8)]">
+          <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-ember font-display text-3xl font-bold italic text-paper shadow-[0_8px_24px_-8px_rgba(255,196,0,0.8)]">
             m
           </span>
           <h1 className="mt-5 font-display text-[28px] font-semibold tracking-tight text-ink">
@@ -102,7 +102,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={busy}
-            className="mt-6 w-full rounded-xl bg-ink py-3 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember disabled:cursor-wait disabled:opacity-60"
+            className="mt-6 w-full rounded-xl bg-ink py-3 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember hover:text-ink disabled:cursor-wait disabled:opacity-60"
           >
             {busy ? "Signing in…" : "Sign in"}
           </button>

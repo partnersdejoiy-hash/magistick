@@ -26,11 +26,11 @@ export default function ArticleView({
       <Reveal y={12}>
         <Link
           href="/updates"
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stone-500 transition-colors hover:text-ember"
+          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stone-500 transition-colors hover:text-magenta"
         >
           <IconArrowLeft size={14} /> All updates
         </Link>
-        <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.22em] text-ember">
+        <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.22em] text-magenta">
           {article.category}
         </p>
         <h1 className="mt-3 font-display text-[36px] font-semibold leading-[1.08] tracking-tight text-ink sm:text-[44px]">
@@ -63,7 +63,7 @@ export default function ArticleView({
             <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400">
               <IconArrowLeft size={12} /> Newer
             </p>
-            <p className="mt-2 font-display text-[16px] font-medium leading-snug text-ink transition-colors group-hover:text-ember-deep">
+            <p className="mt-2 font-display text-[16px] font-medium leading-snug text-ink transition-colors group-hover:text-brandblue">
               {prev.title}
             </p>
           </Link>
@@ -73,7 +73,7 @@ export default function ArticleView({
             <p className="flex items-center justify-end gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400">
               Older <IconArrowRight size={12} />
             </p>
-            <p className="mt-2 font-display text-[16px] font-medium leading-snug text-ink transition-colors group-hover:text-ember-deep">
+            <p className="mt-2 font-display text-[16px] font-medium leading-snug text-ink transition-colors group-hover:text-brandblue">
               {next.title}
             </p>
           </Link>

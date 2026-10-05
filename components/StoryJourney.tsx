@@ -165,8 +165,8 @@ function Panel({
             href={story.cta.href}
             className={`group mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 active:scale-95 ${
               dark
-                ? "bg-paper text-ink hover:bg-ember hover:text-paper"
-                : "bg-ink text-paper hover:bg-ember"
+                ? "bg-paper text-ink hover:bg-ember hover:text-ink"
+                : "bg-ink text-paper hover:bg-ember hover:text-ink"
             }`}
           >
             {story.cta.label}

@@ -127,7 +127,7 @@ export default function TicketPanel() {
   if (notConnected) {
     return (
       <div className="rounded-3xl border border-dashed border-line bg-white/60 p-12 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-ember-tint text-ember">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-ember-tint text-ember-ink">
           <IconInbox size={22} />
         </span>
         <p className="mt-4 font-display text-xl font-semibold text-ink">Help desk not connected yet</p>
@@ -174,7 +174,7 @@ export default function TicketPanel() {
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={() => setShowForm((v) => !v)}
-          className="flex items-center gap-2 rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-paper shadow-[0_8px_20px_-8px_rgba(217,72,15,0.7)] transition-colors hover:bg-ember-deep"
+          className="flex items-center gap-2 rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-paper shadow-[0_8px_20px_-8px_rgba(255,196,0,0.7)] transition-colors hover:bg-ember-deep"
         >
           <IconPlus size={15} />
           {showForm ? "Close form" : "New ticket"}
@@ -230,7 +230,7 @@ export default function TicketPanel() {
                 <span className="shrink-0 text-[12px] font-medium capitalize text-stone-400">
                   {t.status.replace("_", " ")}
                 </span>
-                <IconChevronDown size={15} className="-rotate-90 text-stone-300 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-ember" />
+                <IconChevronDown size={15} className="-rotate-90 text-stone-300 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-magenta" />
               </button>
             </motion.li>
           ))}
@@ -325,7 +325,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
         whileTap={{ scale: 0.97 }}
         type="submit"
         disabled={saving}
-        className="mt-5 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember disabled:opacity-50"
+        className="mt-5 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember hover:text-ink disabled:opacity-50"
       >
         {saving ? "Raising…" : "Submit ticket"}
       </motion.button>
@@ -365,7 +365,7 @@ function TicketThread({ ticket, comments, onBack, onCommented }: {
     >
       <button
         onClick={onBack}
-        className="flex items-center gap-1.5 text-[13px] font-medium text-stone-500 transition-colors hover:text-ember"
+        className="flex items-center gap-1.5 text-[13px] font-medium text-stone-500 transition-colors hover:text-magenta"
       >
         <IconArrowLeft size={14} /> All tickets
       </button>

@@ -22,7 +22,7 @@ export default function NotAllowed({ what = "this area" }: { what?: string }) {
         </p>
         <Link
           href="/"
-          className="mt-7 inline-flex items-center gap-1.5 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember"
+          className="mt-7 inline-flex items-center gap-1.5 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember hover:text-ink"
         >
           <IconArrowLeft size={14} /> Back home
         </Link>

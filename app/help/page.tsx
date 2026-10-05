@@ -27,16 +27,16 @@ export default function HelpPage() {
               style={{ background: "radial-gradient(closest-side, #D9480F, transparent)" }}
             />
             <div className="relative">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ember text-paper">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ember text-ink">
                 <IconTicket size={20} />
               </span>
               <h2 className="mt-4 font-display text-[24px] font-semibold tracking-tight">
                 General tickets, inline
               </h2>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-stone-400">
-                <li className="flex gap-2.5"><span className="text-ember">—</span>HR, payroll, WFM, facilities & more</li>
-                <li className="flex gap-2.5"><span className="text-ember">—</span>Raise one below in under a minute</li>
-                <li className="flex gap-2.5"><span className="text-ember">—</span>Follow the full thread without leaving magistick</li>
+                <li className="flex gap-2.5"><span className="text-magenta">—</span>HR, payroll, WFM, facilities & more</li>
+                <li className="flex gap-2.5"><span className="text-magenta">—</span>Raise one below in under a minute</li>
+                <li className="flex gap-2.5"><span className="text-magenta">—</span>Follow the full thread without leaving magistick</li>
               </ul>
             </div>
             <p className="relative mt-6 text-[12px] uppercase tracking-[0.18em] text-stone-500">

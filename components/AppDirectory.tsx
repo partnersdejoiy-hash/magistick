@@ -38,15 +38,17 @@ function DirectoryRow({
         aria-label={`${app.name} — ${app.blurb}`}
       >
         <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white transition-transform duration-300 group-hover:scale-105"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-105"
           style={{ backgroundColor: app.color }}
         >
-          <Icon size={20} />
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white" style={{ color: app.color }}>
+            <Icon size={18} />
+          </span>
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2">
-            <span className="truncate text-[15px] font-semibold tracking-tight text-ink">{app.name}</span>
-            {pinned && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ember" aria-label="Pinned" />}
+            <span className="truncate text-[14px] font-bold tracking-tight text-ink">{app.name}</span>
+            {pinned && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-magenta" aria-label="Pinned" />}
           </span>
           <span className="mt-0.5 block truncate text-[13px] text-stone-500">{app.blurb}</span>
         </span>
@@ -70,14 +72,14 @@ function DirectoryRow({
             }
           }}
           className={`shrink-0 rounded-lg p-2 transition-colors ${
-            pinned ? "text-ember" : "text-stone-300 hover:bg-parchment hover:text-ember"
+            pinned ? "text-magenta" : "text-stone-300 hover:bg-parchment hover:text-magenta"
           }`}
         >
           <IconPin size={16} />
         </span>
         <IconArrowRight
           size={16}
-          className="shrink-0 text-stone-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-ember"
+          className="shrink-0 text-stone-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-magenta"
         />
       </a>
     </motion.li>
@@ -185,7 +187,7 @@ export default function AppDirectory({ initialQuery = "" }: { initialQuery?: str
 
       {pins.length > 0 && (
         <p className="mt-4 flex items-center gap-1.5 text-xs text-stone-500">
-          <IconPin size={12} className="text-ember" />
+          <IconPin size={12} className="text-magenta" />
           {pins.length} pinned — pinned apps always appear first.
         </p>
       )}

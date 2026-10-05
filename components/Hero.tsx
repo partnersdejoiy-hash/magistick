@@ -63,7 +63,7 @@ export default function Hero() {
             <motion.div whileTap={{ scale: 0.96 }}>
               <Link
                 href="/apps"
-                className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition-colors duration-300 hover:bg-ember"
+                className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition-colors duration-300 hover:bg-ember hover:text-ink"
               >
                 Browse your apps
                 <IconArrowRight size={15} />
@@ -74,10 +74,10 @@ export default function Hero() {
             href="/help"
             className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink"
           >
-            <span className="border-b border-ink/25 pb-0.5 transition-colors group-hover:border-ember group-hover:text-ember">
+            <span className="border-b border-ink/25 pb-0.5 transition-colors group-hover:border-ember group-hover:text-magenta">
               Get help
             </span>
-            <IconArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:text-ember" />
+            <IconArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:text-magenta" />
           </Link>
         </motion.div>
       </div>

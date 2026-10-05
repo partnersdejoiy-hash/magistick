@@ -50,7 +50,7 @@ function PostEditor({
     form.body.some((p) => p.trim().length > 0);
 
   return (
-    <div className="rounded-2xl border border-ember/40 bg-white/80 p-6 shadow-lift sm:p-8">
+    <div className="rounded-2xl border border-magenta/40 bg-white/80 p-6 shadow-lift sm:p-8">
       <h2 className="font-display text-[22px] font-semibold tracking-tight text-ink">
         {editingSlug ? "Edit post" : "New post"}
       </h2>
@@ -92,7 +92,7 @@ function PostEditor({
           type="button"
           disabled={!valid}
           onClick={() => valid && onSave(form)}
-          className="rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember hover:text-ink active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {editingSlug ? "Save changes" : "Publish post"}
         </button>
@@ -163,7 +163,7 @@ export default function ManagePostsPage() {
   return (
     <div className="space-y-8">
       <Reveal>
-        <Link href="/admin" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stone-500 transition-colors hover:text-ember">
+        <Link href="/admin" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stone-500 transition-colors hover:text-magenta">
           <IconArrowLeft size={14} /> Roles &amp; access
         </Link>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
@@ -229,7 +229,7 @@ export default function ManagePostsPage() {
                 setSavedSlug(null);
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="rounded-full border border-line px-4 py-1.5 text-[13px] font-semibold text-stone-500 transition-colors hover:border-ember/50 hover:text-ember"
+              className="rounded-full border border-line px-4 py-1.5 text-[13px] font-semibold text-stone-500 transition-colors hover:border-magenta/50 hover:text-magenta"
             >
               Edit
             </button>

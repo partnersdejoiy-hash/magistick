@@ -45,8 +45,8 @@ function RailTile({
           title={pinned ? "Unpin" : "Pin to top"}
           className={`absolute right-2.5 top-2.5 rounded-md p-1.5 transition-all duration-200 ${
             pinned
-              ? "text-ember opacity-100"
-              : "text-stone-300 opacity-0 hover:text-ember focus-visible:opacity-100 group-hover:opacity-100"
+              ? "text-magenta opacity-100"
+              : "text-stone-300 opacity-0 hover:text-magenta focus-visible:opacity-100 group-hover:opacity-100"
           }`}
         >
           <IconPin size={14} />
@@ -58,17 +58,20 @@ function RailTile({
           className="block"
           aria-label={`${app.name} — ${app.blurb}`}
         >
+          {/* Glowstick-style tile: solid color square, white medallion, line icon in tile color */}
           <span
-            className="flex h-11 w-11 items-center justify-center rounded-xl text-white transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
+            className="flex h-16 w-16 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-3"
             style={{ backgroundColor: app.color }}
           >
-            <Icon size={20} />
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white" style={{ color: app.color }}>
+              <Icon size={20} />
+            </span>
           </span>
-          <span className="mt-3.5 flex items-center gap-1.5">
-            <span className="truncate text-[14px] font-semibold tracking-tight text-ink">
+          <span className="mt-3 flex items-center gap-1.5">
+            <span className="truncate text-[13px] font-bold tracking-tight text-ink">
               {app.name}
             </span>
-            {pinned && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ember" aria-hidden />}
+            {pinned && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-magenta" aria-hidden />}
           </span>
           <span className="mt-1 line-clamp-2 block text-xs leading-relaxed text-stone-500">
             {app.blurb}
@@ -159,7 +162,7 @@ export default function AppRail() {
       initial={false}
       animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 0.85 }}
       transition={{ duration: 0.25, ease: EASE }}
-      className="absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-paper/95 text-ink shadow-card backdrop-blur transition-colors hover:border-ember/40 hover:text-ember md:flex"
+      className="absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-paper/95 text-ink shadow-card backdrop-blur transition-colors hover:border-ember/40 hover:text-magenta md:flex"
       style={{
         ...(dir === 1 ? { right: 6 } : { left: 6 }),
         pointerEvents: visible ? "auto" : "none",

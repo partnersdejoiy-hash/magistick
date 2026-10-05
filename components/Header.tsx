@@ -75,7 +75,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/95 text-paper backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-5 px-5 sm:px-8">
         <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="magistick home">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ember font-display text-xl font-bold italic text-paper shadow-[0_4px_14px_-4px_rgba(217,72,15,0.7)] transition-transform duration-300 group-hover:-rotate-6">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ember font-display text-xl font-bold italic text-paper shadow-[0_4px_14px_-4px_rgba(255,196,0,0.7)] transition-transform duration-300 group-hover:-rotate-6">
             m
           </span>
           <span className="font-display text-[19px] font-semibold tracking-tight">

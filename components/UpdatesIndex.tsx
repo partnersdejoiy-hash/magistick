@@ -20,7 +20,7 @@ function FeaturedArticle({ article }: { article: Article }) {
           <span className="rounded-full bg-ember-tint px-3 py-1 text-ember-ink">{article.category}</span>
           <span className="text-stone-500">{formatDate(article.date)}</span>
         </div>
-        <h3 className="mt-4 max-w-3xl font-display text-3xl font-semibold leading-[1.12] tracking-tight text-ink transition-colors duration-300 group-hover:text-ember-deep sm:text-4xl">
+        <h3 className="mt-4 max-w-3xl font-display text-3xl font-semibold leading-[1.12] tracking-tight text-ink transition-colors duration-300 group-hover:text-brandblue sm:text-4xl">
           {article.title}
         </h3>
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-stone-600">{article.excerpt}</p>
@@ -48,7 +48,7 @@ function IndexRow({ article, index }: { article: Article; index: number }) {
           {formatDate(article.date)}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ember">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-magenta">
             {article.category}
           </span>
           <span className="mt-1 block font-display text-[19px] font-medium leading-snug tracking-tight text-ink">
@@ -58,7 +58,7 @@ function IndexRow({ article, index }: { article: Article; index: number }) {
         </span>
         <IconArrowRight
           size={18}
-          className="shrink-0 self-center text-stone-300 transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-ember"
+          className="shrink-0 self-center text-stone-300 transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-magenta"
         />
       </Link>
     </motion.li>
@@ -119,7 +119,7 @@ export default function UpdatesIndex({
               {active && (
                 <motion.span
                   layoutId="updates-cat-underline"
-                  className="absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-ember"
+                  className="absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-magenta"
                   transition={{ type: "spring", stiffness: 420, damping: 34 }}
                 />
               )}

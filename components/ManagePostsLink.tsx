@@ -11,7 +11,7 @@ export default function ManagePostsLink() {
   return (
     <Link
       href="/admin/posts"
-      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white/70 px-4 py-2 text-[13px] font-semibold text-stone-500 transition-all duration-200 hover:border-ember/50 hover:text-ember"
+      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white/70 px-4 py-2 text-[13px] font-semibold text-stone-500 transition-all duration-200 hover:border-magenta/50 hover:text-magenta"
     >
       <IconPlus size={14} /> Manage posts
     </Link>

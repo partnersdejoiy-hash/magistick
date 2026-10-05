@@ -21,7 +21,7 @@ export default function HomePage() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-400">Launcher</p>
               <h2 className="mt-1 font-display text-[28px] font-semibold tracking-tight text-ink">Your apps</h2>
             </div>
-            <Link href="/apps" className="group flex items-center gap-1.5 text-sm font-medium text-stone-500 transition-colors hover:text-ember">
+            <Link href="/apps" className="group flex items-center gap-1.5 text-sm font-medium text-stone-500 transition-colors hover:text-magenta">
               View all
               <IconArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
@@ -53,7 +53,7 @@ export default function HomePage() {
           </Parallax>
           <div className="relative flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
             <div className="flex items-start gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ember text-paper">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ember text-ink">
                 <IconTicket size={20} />
               </span>
               <div>
@@ -66,7 +66,7 @@ export default function HomePage() {
             <Magnetic>
               <Link
                 href="/help"
-                className="inline-flex shrink-0 items-center gap-2 rounded-full bg-paper px-6 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:bg-ember hover:text-paper active:scale-95"
+                className="inline-flex shrink-0 items-center gap-2 rounded-full bg-paper px-6 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:bg-ember hover:text-ink active:scale-95"
               >
                 Open Get Help
                 <IconArrowRight size={15} />
@@ -84,7 +84,7 @@ export default function HomePage() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-400">Bulletin</p>
               <h2 className="mt-1 font-display text-[28px] font-semibold tracking-tight text-ink">Latest updates</h2>
             </div>
-            <Link href="/updates" className="group flex items-center gap-1.5 text-sm font-medium text-stone-500 transition-colors hover:text-ember">
+            <Link href="/updates" className="group flex items-center gap-1.5 text-sm font-medium text-stone-500 transition-colors hover:text-magenta">
               All updates
               <IconArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
