@@ -39,7 +39,7 @@ export default function HeaderNav() {
             {active && (
               <motion.span
                 layoutId="nav-ember-underline"
-                className="absolute inset-x-3 -bottom-[13px] h-[2.5px] rounded-full bg-ember"
+                className="absolute inset-x-3 -bottom-[13px] h-[2.5px] rounded-full bg-magenta"
                 transition={{ type: "spring", stiffness: 420, damping: 34 }}
               />
             )}

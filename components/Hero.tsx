@@ -38,7 +38,7 @@ export default function Hero() {
           transition={{ duration: 0.6, ease: EASE }}
           className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-500"
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-ember" aria-hidden />
+          <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden />
           DEJOIY BPO · Employee portal
         </motion.p>
         <h1 className="mt-5 max-w-3xl font-display text-[44px] font-semibold leading-[1.04] tracking-tight text-ink sm:text-[64px]">

@@ -144,7 +144,7 @@ function Panel({
               dark ? "text-paper/70" : "text-ember-ink/70"
             }`}
           >
-            <span className={`mr-2 inline-block h-1.5 w-1.5 rounded-full ${dark ? "bg-ember" : "bg-ember"}`} aria-hidden />
+            <span className={`mr-2 inline-block h-1.5 w-1.5 rounded-full ${dark ? "bg-gold" : "bg-gold"}`} aria-hidden />
             {story.kicker}
           </p>
           <h2
@@ -231,7 +231,7 @@ export default function StoryJourney() {
               <BannerArt theme={story.theme} />
             </div>
             <div className="relative px-7 py-12 sm:px-10">
-              <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${story.theme === "gold" ? "text-ember-ink/70" : "text-paper/70"}`}>
+              <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${story.theme === "gold" ? "text-gold-ink/70" : "text-paper/70"}`}>
                 {story.kicker}
               </p>
               <h2 className={`mt-4 font-display text-3xl font-semibold tracking-tight ${story.theme === "gold" ? "text-ink" : "text-paper"}`}>
@@ -283,7 +283,7 @@ export default function StoryJourney() {
               <span
                 className={`block rounded-full transition-all duration-300 ${
                   i === active
-                    ? "h-6 w-[3px] bg-ember"
+                    ? "h-6 w-[3px] bg-gold"
                     : "h-[3px] w-[3px] bg-ink/25 group-hover:bg-ink/50"
                 }`}
               />

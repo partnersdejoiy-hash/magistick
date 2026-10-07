@@ -1,10 +1,13 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Glowstick-matched palette (sampled from glowstick.taskus.com, 2026-10-05):
+ * Glowstick-inspired palette, refined (2026-10-07):
  * - paper: light cool gray page background
  * - ink: near-black charcoal for header/footer/dark surfaces
- * - ember: repurposed as Glowstick's signature golden yellow (CTAs, highlights)
+ * - ember: refined brass/amber — the primary warm accent (buttons, hovers,
+ *   focus rings, badges). Deep enough to stay classy on light gray.
+ * - gold: Glowstick's signature yellow, used SPARINGLY — logo mark, tiny
+ *   dots, hairline accents only. Never large surfaces.
  * - magenta: active-nav pink/red accent
  * - brandblue: link/article-title blue
  */
@@ -19,7 +22,13 @@ const config: Config = {
         inksoft: "#333333", // softer ink surfaces
         line: "#E1E2E4", // cool hairline borders
         ember: {
-          DEFAULT: "#FFC400", // Glowstick golden yellow — the signature accent
+          DEFAULT: "#B45309", // refined brass — primary warm accent
+          deep: "#92400E",
+          tint: "#FAF0DC",
+          ink: "#7C4A03",
+        },
+        gold: {
+          DEFAULT: "#FFC400", // Glowstick signature yellow — tiny accents only
           deep: "#EAB308",
           tint: "#FFF4CC",
           ink: "#6B4E00",

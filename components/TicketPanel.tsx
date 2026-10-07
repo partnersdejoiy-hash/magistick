@@ -174,7 +174,7 @@ export default function TicketPanel() {
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={() => setShowForm((v) => !v)}
-          className="flex items-center gap-2 rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-paper shadow-[0_8px_20px_-8px_rgba(255,196,0,0.7)] transition-colors hover:bg-ember-deep"
+          className="flex items-center gap-2 rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-paper shadow-[0_8px_20px_-8px_rgba(180,83,9,0.45)] transition-colors hover:bg-ember-deep"
         >
           <IconPlus size={15} />
           {showForm ? "Close form" : "New ticket"}
