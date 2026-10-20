@@ -1,32 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sql, ensureSchema, type DbApp } from "@/lib/db";
-import { getSessionUser, canAdminister } from "@/lib/auth";
+import { sql, logAudit, type DbApp } from "@/lib/db";
+import { requireMe } from "@/lib/auth";
+import { LEVEL_IDS } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
 async function guard() {
-  const user = await getSessionUser();
-  if (!user) return { error: NextResponse.json({ error: "Sign in required." }, { status: 401 }) };
-  if (!canAdminister(user.role)) {
-    return { error: NextResponse.json({ error: "Admins only." }, { status: 403 }) };
-  }
-  try {
-    await ensureSchema();
-  } catch (err) {
-    return {
-      error: NextResponse.json(
-        { error: err instanceof Error ? err.message : "Database not reachable." },
-        { status: 503 },
-      ),
-    };
-  }
-  return {};
+  const g = await requireMe(["manage_apps"]);
+  return "error" in g ? g : { me: g.me };
 }
 
 /** GET /api/admin/apps → full catalog (admin view, unfiltered). */
 export async function GET() {
   const g = await guard();
-  if (g.error) return g.error;
+  if ("error" in g) return g.error;
   const db = sql();
   const rows = (await db`
     SELECT id, name, blurb, category, href, icon, color, sort_order
@@ -38,7 +25,7 @@ export async function GET() {
 /** POST /api/admin/apps { name, blurb?, category?, href, icon?, color? } */
 export async function POST(req: NextRequest) {
   const g = await guard();
-  if (g.error) return g.error;
+  if ("error" in g) return g.error;
   let body: Partial<DbApp>;
   try {
     body = await req.json();
@@ -70,8 +57,9 @@ export async function POST(req: NextRequest) {
   await db`
     INSERT INTO apps (id, name, blurb, category, href, icon, color, sort_order)
     VALUES (${app.id}, ${app.name}, ${app.blurb}, ${app.category}, ${app.href}, ${app.icon}, ${app.color}, ${app.sort_order})`;
-  for (const role of ["admin", "collaborator", "employee"]) {
+  for (const role of LEVEL_IDS) {
     await db`INSERT INTO app_permissions (app_id, role, allowed) VALUES (${id}, ${role}, TRUE)`;
   }
+  await logAudit(g.me, "app.create", app.name);
   return NextResponse.json({ app }, { status: 201 });
 }

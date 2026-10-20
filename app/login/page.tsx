@@ -1,16 +1,15 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
-import { EASE } from "@/components/motion";
+import { useSearchParams } from "next/navigation";
+import { DEPARTMENTS } from "@/lib/rbac";
+import { Stamp } from "@/components/Stamp";
 
 /**
  * Sign-in — email + password. First ever sign-in bootstraps the admin
  * account from ADMIN_EMAIL / ADMIN_PASSWORD env vars (server-side).
  */
 function LoginForm() {
-  const router = useRouter();
   const search = useSearchParams();
   const next = search.get("next") || "/";
   const [email, setEmail] = useState("");
@@ -33,8 +32,8 @@ function LoginForm() {
         setError(data.error || "Sign-in failed. Check your email and password.");
         return;
       }
-      router.push(next);
-      router.refresh();
+      // Full load so the session context picks up the new cookie.
+      window.location.href = next.startsWith("/") && !next.startsWith("//") ? next : "/";
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
     } finally {
@@ -43,38 +42,37 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
-      <motion.div
-        initial={{ opacity: 0, y: 22 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="w-full max-w-sm"
-      >
-        <div className="mb-8 text-center">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gold font-display text-3xl font-bold italic text-ink shadow-[0_8px_24px_-8px_rgba(255,196,0,0.35)]">
-            m
-          </span>
-          <h1 className="mt-5 font-display text-[28px] font-semibold tracking-tight text-ink">
-            Welcome back
-          </h1>
-          <p className="mt-1.5 text-sm text-stone-500">
-            Sign in to your magistick workspace
+    <div className="mx-auto grid min-h-[72vh] max-w-5xl items-stretch overflow-hidden rounded-2xl border border-line bg-panel shadow-card md:grid-cols-[1fr_1.1fr]">
+      <div className="relative hidden flex-col justify-between bg-nil p-8 text-white md:flex">
+        <div>
+          <p className="text-[22px] font-semibold tracking-tight">magistick</p>
+          <p className="mt-2 max-w-xs text-[14px] leading-relaxed text-white/75">
+            One front door for DEJOIY: your apps, your department&rsquo;s updates, your reporting line and your tickets.
           </p>
         </div>
+        <ul className="grid grid-cols-4 gap-x-4 gap-y-5" aria-label="Departments">
+          {DEPARTMENTS.map((d) => (
+            <li key={d.id} className="flex flex-col items-start gap-1.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-md" style={{ backgroundColor: d.dye }}>
+                <Stamp dept={d.id} size={18} color="rgba(255,255,255,0.9)" />
+              </span>
+              <span className="text-[11.5px] leading-tight text-white/70">{d.label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-        <form
-          onSubmit={submit}
-          className="rounded-3xl border border-line bg-white/80 p-7 shadow-card backdrop-blur"
-        >
+      <div className="flex items-center justify-center px-6 py-12 sm:px-10">
+        <form onSubmit={submit} className="w-full max-w-sm" noValidate>
+          <h1 className="text-[22px] font-semibold tracking-tight text-ink">Sign in</h1>
+          <p className="mt-1 text-[14px] text-stone-600">Use your DEJOIY work email.</p>
           {error && (
-            <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-[13px] font-medium text-red-700">
+            <p role="alert" className="mt-5 rounded-lg border border-bad/30 bg-bad-tint px-3.5 py-2.5 text-[13.5px] text-bad">
               {error}
             </p>
           )}
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">
-              Work email
-            </span>
+          <label className="mt-6 block">
+            <span className="mb-1.5 block text-[13px] font-medium text-stone-700">Work email</span>
             <input
               type="email"
               required
@@ -82,37 +80,32 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@dejoiy.com"
-              className="w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm text-ink placeholder:text-stone-400 focus:border-ember focus:outline-none"
+              className="h-11 w-full rounded-lg border border-line bg-panel px-3.5 text-[14px] text-ink placeholder:text-stone-400 focus:border-ember focus:outline-none"
             />
           </label>
           <label className="mt-4 block">
-            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">
-              Password
-            </span>
+            <span className="mb-1.5 block text-[13px] font-medium text-stone-700">Password</span>
             <input
               type="password"
               required
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm text-ink placeholder:text-stone-400 focus:border-ember focus:outline-none"
+              className="h-11 w-full rounded-lg border border-line bg-panel px-3.5 text-[14px] text-ink focus:border-ember focus:outline-none"
             />
           </label>
           <button
             type="submit"
             disabled={busy}
-            className="mt-6 w-full rounded-xl bg-ink py-3 text-sm font-semibold text-paper transition-all duration-200 hover:bg-ember hover:text-ink disabled:cursor-wait disabled:opacity-60"
+            className="mt-6 h-11 w-full rounded-lg bg-ember text-[14px] font-semibold text-white transition-colors hover:bg-nil disabled:cursor-wait disabled:opacity-60"
           >
             {busy ? "Signing in…" : "Sign in"}
           </button>
-          <p className="mt-4 text-center text-xs leading-relaxed text-stone-400">
-            Internal use only · DEJOIY India Pvt. Ltd.
-            <br />
-            Trouble signing in? Raise it with your manager.
+          <p className="mt-5 text-[12.5px] leading-relaxed text-stone-500">
+            Forgot your password? Your team leader or HR can reset it from Admin → People.
           </p>
         </form>
-      </motion.div>
+      </div>
     </div>
   );
 }

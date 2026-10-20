@@ -6,92 +6,64 @@
   color-scheme: light;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
-  @apply bg-paper font-sans text-ink antialiased;
-  text-rendering: optimizeLegibility;
+  @apply bg-ground font-sans text-ink antialiased;
+  font-feature-settings: "cv11", "ss01";
 }
 
 ::selection {
-  background: #d9480f;
-  color: #faf8f3;
+  background: #fbf0d6; /* haldi tint */
+  color: #161a33;
 }
 
-/* Confident, visible keyboard focus everywhere */
+input,
+textarea {
+  caret-color: #2b3a8c;
+}
+
 :focus-visible {
-  outline: 2px solid #d9480f;
-  outline-offset: 3px;
-  border-radius: 4px;
+  outline: 2px solid #2b3a8c;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.on-nil :focus-visible,
+.on-nil:focus-visible {
+  outline-color: #e0a526;
 }
 
-/* ---- film grain, used sparingly over ambient fields ---- */
-.grain::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+a {
+  text-underline-offset: 3px;
 }
 
-/* ---- slow ambient drift for gradient fields (threeui-inspired, tasteful) ---- */
-@keyframes drift-a {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(4%, -6%, 0) scale(1.12); }
-}
-@keyframes drift-b {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
-  50% { transform: translate3d(-5%, 5%, 0) scale(0.95); }
-}
-.animate-drift-a { animation: drift-a 14s ease-in-out infinite; }
-.animate-drift-b { animation: drift-b 18s ease-in-out infinite; }
-
-/* ---- editorial drop cap for article bodies ---- */
-.dropcap::first-letter {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 3.4em;
-  line-height: 0.86;
-  float: left;
-  margin: 0.06em 0.14em 0 0;
-  color: #1b1611;
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
-/* ---- thin warm scrollbars for rails ---- */
+/* Thin indigo scrollbars for rails and tables */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #c3c7d8 transparent;
+}
 .scroll-thin::-webkit-scrollbar { height: 8px; width: 8px; }
-.scroll-thin::-webkit-scrollbar-thumb { background: #d8cfb8; border-radius: 999px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #c3c7d8; border-radius: 999px; }
 .scroll-thin::-webkit-scrollbar-track { background: transparent; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ---- shimmer skeleton ---- */
+/* Skeleton loading */
 @keyframes shimmer {
   0% { background-position: -400px 0; }
   100% { background-position: 400px 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #f2eee2 25%, #faf8f3 50%, #f2eee2 75%);
+  background: linear-gradient(90deg, #e7e9f2 25%, #f1f2f7 50%, #e7e9f2 75%);
   background-size: 800px 100%;
   animation: shimmer 1.4s linear infinite;
+  border-radius: 8px;
 }
-
-/* ---- lenis smooth scroll (recommended base styles) ---- */
-html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
-
-/* ---- respect reduced motion: kill ambient + smooth scroll ---- */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .animate-drift-a, .animate-drift-b { animation: none; }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+  .skeleton { animation: none; }
 }
+
+/* Article body: comfortable measure */
+.prose-body p + p { margin-top: 1.1em; }

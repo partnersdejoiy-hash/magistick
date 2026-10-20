@@ -174,7 +174,7 @@ export default function TicketPanel() {
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={() => setShowForm((v) => !v)}
-          className="flex items-center gap-2 rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-paper shadow-[0_8px_20px_-8px_rgba(180,83,9,0.45)] transition-colors hover:bg-ember-deep"
+          className="flex items-center gap-2 rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember-deep"
         >
           <IconPlus size={15} />
           {showForm ? "Close form" : "New ticket"}
@@ -281,7 +281,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
       <p className="mt-1 text-[13px] text-stone-500">Describe it well — good tickets get fixed faster.</p>
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <label className="block sm:col-span-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">Subject *</span>
+          <span className="text-[13px] font-medium text-stone-700">Subject *</span>
           <input
             required
             value={subject}
@@ -291,7 +291,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
           />
         </label>
         <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">Department</span>
+          <span className="text-[13px] font-medium text-stone-700">Department</span>
           <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} className={inputCls}>
             <option value="">General</option>
             {departments.map((d) => (
@@ -300,7 +300,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
           </select>
         </label>
         <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">Priority</span>
+          <span className="text-[13px] font-medium text-stone-700">Priority</span>
           <select value={priority} onChange={(e) => setPriority(e.target.value)} className={inputCls}>
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -309,7 +309,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
           </select>
         </label>
         <label className="block sm:col-span-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">Describe the issue *</span>
+          <span className="text-[13px] font-medium text-stone-700">Describe the issue *</span>
           <textarea
             required
             rows={4}
@@ -325,7 +325,7 @@ function NewTicketForm({ departments, onCreated }: { departments: { id: number; 
         whileTap={{ scale: 0.97 }}
         type="submit"
         disabled={saving}
-        className="mt-5 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember hover:text-ink disabled:opacity-50"
+        className="mt-5 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-nil disabled:opacity-50"
       >
         {saving ? "Raising…" : "Submit ticket"}
       </motion.button>
@@ -384,7 +384,7 @@ function TicketThread({ ticket, comments, onBack, onCommented }: {
         {ticket.description}
       </p>
 
-      <h3 className="mt-8 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+      <h3 className="mt-8 text-[13px] font-semibold text-stone-700">
         Thread · {comments.length}
       </h3>
       <ul className="mt-4 space-y-4">
@@ -424,7 +424,7 @@ function TicketThread({ ticket, comments, onBack, onCommented }: {
           whileTap={{ scale: 0.95 }}
           onClick={send}
           disabled={sending || !draft.trim()}
-          className="rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember-deep disabled:opacity-40"
+          className="rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember-deep disabled:opacity-40"
         >
           {sending ? "Sending…" : "Reply"}
         </motion.button>

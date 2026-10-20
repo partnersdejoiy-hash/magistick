@@ -2,36 +2,26 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
+import { isLevel } from "./lib/rbac";
+
 /**
- * Phase-2 gate: every route except /login + /api/auth/login needs a valid
- * session cookie. /admin* and /api/admin/* additionally need the right role.
+ * Gate: every route except /login + /api/auth/login needs a valid session.
+ * Fine-grained permissions are checked per API route against the live
+ * permission matrix (lib/auth requireMe), so a role change applies instantly.
  */
 
 const SESSION_COOKIE = "magistick_session";
 
-type Role = "admin" | "collaborator" | "employee";
-
-async function sessionRole(req: NextRequest): Promise<Role | null> {
+async function signedIn(req: NextRequest): Promise<boolean> {
   const token = req.cookies.get(SESSION_COOKIE)?.value;
-  if (!token) return null;
   const secret = process.env.AUTH_SECRET;
-  if (!secret) return null;
+  if (!token || !secret) return false;
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
-    const role = (payload as { role?: unknown }).role;
-    return role === "admin" || role === "collaborator" || role === "employee" ? role : null;
+    return isLevel((payload as { role?: unknown }).role);
   } catch {
-    return null;
+    return false;
   }
-}
-
-function deny(req: NextRequest) {
-  if (req.nextUrl.pathname.startsWith("/api/")) {
-    return NextResponse.json({ error: "Not allowed for your role." }, { status: 403 });
-  }
-  const url = req.nextUrl.clone();
-  url.pathname = "/not-allowed";
-  return NextResponse.rewrite(url);
 }
 
 export async function middleware(req: NextRequest) {
@@ -48,8 +38,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const role = await sessionRole(req);
-  if (!role) {
+  if (!(await signedIn(req))) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
@@ -58,18 +47,6 @@ export async function middleware(req: NextRequest) {
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
-
-  const startsWithOne = (list: string[]) =>
-    list.some((p) => pathname === p || pathname.startsWith(p + "/"));
-
-  const isPostsArea = startsWithOne(["/admin/posts", "/api/admin/posts"]);
-  const isAdminArea =
-    pathname === "/admin" ||
-    (pathname.startsWith("/admin/") && !isPostsArea) ||
-    startsWithOne(["/api/admin/users", "/api/admin/apps", "/api/admin/permissions"]);
-
-  if (isAdminArea && role !== "admin") return deny(req);
-  if (isPostsArea && role !== "admin" && role !== "collaborator") return deny(req);
 
   return NextResponse.next();
 }

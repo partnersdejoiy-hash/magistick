@@ -2,7 +2,6 @@
  * Seed content for magistick.
  *
  * ARTICLES seeds the bulletin posts table on first boot (lib/db.ts).
- * PEOPLE is the static directory sample until the HR sync lands.
  * The app catalog lives in Postgres now (admin-managed) — see /api/apps.
  */
 
@@ -115,15 +114,6 @@ export const ARTICLES: Article[] = [
       "This is the foundation — next up is the dedicated IT tool itself, then ticket SLAs displayed right on the thread. As always, tell us what's broken via Get Help. We mean that literally.",
     ],
   },
-];
-
-export type Person = { name: string; role: string; team: string; site: string };
-
-export const PEOPLE: Person[] = [
-  { name: "Deepak Sharma", role: "Operations", team: "Leadership", site: "Gurugram" },
-  { name: "Aarav Mehta", role: "Team Lead", team: "Customer Support", site: "Gurugram" },
-  { name: "Sana Iqbal", role: "Quality Analyst", team: "Quality", site: "Remote" },
-  { name: "Rohan Verma", role: "IT Support", team: "IT", site: "Gurugram" },
 ];
 
 /**

@@ -1,87 +1,74 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sql, ensureSchema, ROLE_IDS, type DbApp } from "@/lib/db";
-import { getSessionUser, canAdminister } from "@/lib/auth";
-import type { RoleId } from "@/lib/roles";
+import { sql, logAudit, type DbApp } from "@/lib/db";
+import { requireMe } from "@/lib/auth";
+import { LEVEL_IDS, isDept, type DeptId, type LevelId } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
-async function guard() {
-  const user = await getSessionUser();
-  if (!user) return { error: NextResponse.json({ error: "Sign in required." }, { status: 401 }) };
-  if (!canAdminister(user.role)) {
-    return { error: NextResponse.json({ error: "Admins only." }, { status: 403 }) };
-  }
-  try {
-    await ensureSchema();
-  } catch (err) {
-    return {
-      error: NextResponse.json(
-        { error: err instanceof Error ? err.message : "Database not reachable." },
-        { status: 503 },
-      ),
-    };
-  }
-  return {};
-}
+export type AppAccess = { levels: Record<LevelId, boolean>; departments: DeptId[] /* empty = all */ };
 
-export type AppMatrix = Record<string, Record<RoleId, boolean>>;
-
-/** GET /api/admin/permissions → { apps, matrix } */
+/** GET /api/admin/permissions → { apps, access: { appId: AppAccess } } */
 export async function GET() {
-  const g = await guard();
-  if (g.error) return g.error;
+  const g = await requireMe(["manage_app_access", "manage_apps"]);
+  if ("error" in g) return g.error;
   const db = sql();
   const apps = (await db`
-    SELECT id, name, blurb, category, href, icon, color, sort_order
-    FROM apps ORDER BY sort_order ASC, name ASC
+    SELECT id, name, blurb, category, href, icon, color, sort_order FROM apps ORDER BY sort_order ASC, name ASC
   `) as DbApp[];
   const perms = (await db`SELECT app_id, role, allowed FROM app_permissions`) as {
     app_id: string;
-    role: RoleId;
+    role: string;
     allowed: boolean;
   }[];
-  const matrix: AppMatrix = {};
+  const depts = (await db`SELECT app_id, department FROM app_departments`) as { app_id: string; department: string }[];
+  const access: Record<string, AppAccess> = {};
   for (const a of apps) {
-    matrix[a.id] = { admin: true, collaborator: true, employee: true };
+    access[a.id] = {
+      levels: Object.fromEntries(LEVEL_IDS.map((l) => [l, true])) as Record<LevelId, boolean>,
+      departments: [],
+    };
   }
   for (const p of perms) {
-    if (matrix[p.app_id]) matrix[p.app_id][p.role] = p.allowed;
+    if (access[p.app_id] && (LEVEL_IDS as string[]).includes(p.role)) {
+      access[p.app_id].levels[p.role as LevelId] = p.allowed;
+    }
   }
-  return NextResponse.json({ apps, matrix });
+  for (const d of depts) if (access[d.app_id] && isDept(d.department)) access[d.app_id].departments.push(d.department);
+  return NextResponse.json({ apps, access });
 }
 
-/** PUT /api/admin/permissions { matrix: { appId: { role: boolean } } } */
+/** PUT /api/admin/permissions { appId, levels: {level: bool}, departments: DeptId[] } */
 export async function PUT(req: NextRequest) {
-  const g = await guard();
-  if (g.error) return g.error;
-  let body: { matrix?: AppMatrix };
+  const g = await requireMe(["manage_app_access"]);
+  if ("error" in g) return g.error;
+  let b: { appId?: unknown; levels?: Record<string, unknown>; departments?: unknown };
   try {
-    body = await req.json();
+    b = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
-  const matrix = body.matrix;
-  if (!matrix || typeof matrix !== "object") {
-    return NextResponse.json({ error: "matrix is required." }, { status: 400 });
-  }
   const db = sql();
-  const appIds = (
-    (await db`SELECT id FROM apps`) as { id: string }[]
-  ).map((r) => r.id);
-
-  for (const [appId, roles] of Object.entries(matrix)) {
-    if (!appIds.includes(appId) || !roles || typeof roles !== "object") continue;
-    const entries = ROLE_IDS.filter((r) => typeof roles[r] === "boolean").map(
-      (r) => ({ role: r, allowed: (roles[r] as boolean) === true }),
-    );
-    if (entries.length === 0) continue;
-    if (entries.every((e) => !e.allowed)) continue; // an app must stay usable by someone
-    for (const e of entries) {
-      await db`
-        INSERT INTO app_permissions (app_id, role, allowed)
-        VALUES (${appId}, ${e.role}, ${e.allowed})
-        ON CONFLICT (app_id, role) DO UPDATE SET allowed = EXCLUDED.allowed`;
-    }
+  const app = (await db`SELECT name FROM apps WHERE id = ${String(b.appId)} LIMIT 1`) as { name: string }[];
+  if (app.length === 0) return NextResponse.json({ error: "App not found." }, { status: 404 });
+  const appId = String(b.appId);
+  const levels = LEVEL_IDS.filter((l) => typeof b.levels?.[l] === "boolean");
+  if (levels.length && levels.every((l) => b.levels![l] === false)) {
+    return NextResponse.json({ error: "At least one level must keep this app." }, { status: 400 });
   }
+  for (const l of levels) {
+    await db`
+      INSERT INTO app_permissions (app_id, role, allowed) VALUES (${appId}, ${l}, ${b.levels![l] as boolean})
+      ON CONFLICT (app_id, role) DO UPDATE SET allowed = EXCLUDED.allowed`;
+  }
+  if (Array.isArray(b.departments)) {
+    const ds = b.departments.filter(isDept);
+    await db`DELETE FROM app_departments WHERE app_id = ${appId}`;
+    for (const d of ds) await db`INSERT INTO app_departments (app_id, department) VALUES (${appId}, ${d})`;
+  }
+  await logAudit(g.me, "app.access", app[0].name);
   return NextResponse.json({ ok: true });
 }
+
+
+
+

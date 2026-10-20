@@ -1,86 +1,79 @@
 import TicketPanel from "@/components/TicketPanel";
-import { Reveal } from "@/components/motion";
-import { IconExternal, IconTicket } from "@/components/icons";
+import { IconExternal } from "@/components/icons";
 import { IT_HELPDESK_URL } from "@/lib/data";
+import { Stamp } from "@/components/Stamp";
+import { DEPT_BY_ID, type DeptId } from "@/lib/rbac";
 
 export const metadata = { title: "Get Help — magistick" };
+
+/** Which team owns which kind of question: the map Glowstick hides inside a dropdown. */
+const ROUTES: { dept: DeptId; covers: string }[] = [
+  { dept: "hr", covers: "Policies, employee relations, letters, profile updates" },
+  { dept: "payroll", covers: "Payslips, deductions, PF, reimbursements, tax forms" },
+  { dept: "wfm", covers: "Leave approvals, schedule and shift changes, attendance" },
+  { dept: "training", covers: "Courses, certifications, nesting and floor readiness" },
+  { dept: "quality", covers: "Audit scores, disputes, calibration" },
+  { dept: "admin_facilities", covers: "Seating, transport, access cards, cafeteria" },
+  { dept: "recruitment", covers: "Referrals, interviews, internal job postings" },
+  { dept: "it", covers: "Laptop, network, VPN, passwords, system access" },
+];
 
 export default function HelpPage() {
   return (
     <div>
-      <Reveal>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-400">Support</p>
-        <h1 className="mt-1 font-display text-[34px] font-semibold tracking-tight text-ink">Get Help</h1>
-        <p className="mt-2 max-w-xl text-[14.5px] leading-relaxed text-stone-600">
-          We’re here to help. General tickets are raised and tracked right here, powered by
-          OrbitDesk. IT issues live in the dedicated IT tool.
-        </p>
-      </Reveal>
+      <h1 className="text-[24px] font-semibold tracking-tight text-ink">Get Help</h1>
+      <p className="mt-1 max-w-2xl text-[14px] text-stone-600">
+        General tickets (HR, payroll, WFM, facilities and more) are raised and tracked right here. IT issues go to the IT
+        help desk.
+      </p>
 
-      {/* Two paths — feature band + quiet row, not two identical cards */}
-      <div className="mt-8 grid gap-4 lg:grid-cols-5">
-        <Reveal className="lg:col-span-3" delay={0.05}>
-          <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-3xl bg-ink p-7 text-paper sm:p-8">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
-              style={{ background: "radial-gradient(closest-side, #D9480F, transparent)" }}
-            />
-            <div className="relative">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ember text-ink">
-                <IconTicket size={20} />
-              </span>
-              <h2 className="mt-4 font-display text-[24px] font-semibold tracking-tight">
-                General tickets, inline
-              </h2>
-              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-stone-400">
-                <li className="flex gap-2.5"><span className="text-magenta">—</span>HR, payroll, WFM, facilities & more</li>
-                <li className="flex gap-2.5"><span className="text-magenta">—</span>Raise one below in under a minute</li>
-                <li className="flex gap-2.5"><span className="text-magenta">—</span>Follow the full thread without leaving magistick</li>
-              </ul>
-            </div>
-            <p className="relative mt-6 text-[12px] uppercase tracking-[0.18em] text-stone-500">
-              Scroll down to raise & track ↓
-            </p>
-          </div>
-        </Reveal>
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <section aria-labelledby="who-h" className="lg:col-span-2">
+          <h2 id="who-h" className="mb-3 text-[15px] font-semibold text-ink">Who handles what</h2>
+          <ul className="grid overflow-hidden rounded-xl border border-line bg-panel sm:grid-cols-2">
+            {ROUTES.map((r) => (
+              <li key={r.dept} className="flex gap-3 border-b border-line px-4 py-3 last:border-b-0 sm:[&:nth-last-child(2)]:border-b-0 sm:odd:border-r">
+                <Stamp dept={r.dept} size={16} className="mt-0.5 shrink-0" />
+                <span>
+                  <span className="block text-[13.5px] font-semibold text-ink">
+                    {DEPT_BY_ID[r.dept].label}
+                  </span>
+                  <span className="block text-[12.5px] leading-snug text-stone-600">{r.covers}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        <Reveal className="lg:col-span-2" delay={0.12}>
-          <div className="flex h-full flex-col justify-between rounded-3xl border border-line bg-white/70 p-7 shadow-card sm:p-8">
-            <div>
-              <h2 className="font-display text-[22px] font-semibold tracking-tight text-ink">IT support</h2>
-              <p className="mt-2 text-sm leading-relaxed text-stone-600">
-                Device, network and access issues live in the dedicated IT help-desk tool —
-                opening in a new tab, the way it should be.
-              </p>
-            </div>
-            <div className="mt-6">
-              <a
-                href={IT_HELPDESK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-5 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:border-ink hover:bg-ink hover:text-paper"
-              >
-                Submit IT Ticket
-                <IconExternal size={14} />
-              </a>
-              {IT_HELPDESK_URL === "#" && (
-                <p className="mt-3 text-xs text-stone-400">The dedicated IT tool is being built — this button will open it.</p>
-              )}
-            </div>
-          </div>
-        </Reveal>
+        <section aria-labelledby="it-h" className="rounded-xl border border-line bg-panel p-5">
+          <h2 id="it-h" className="flex items-center gap-2 text-[15px] font-semibold text-ink">
+            <Stamp dept="it" size={16} /> IT help desk
+          </h2>
+          <p className="mt-2 text-[13.5px] leading-relaxed text-stone-600">
+            Device, network and access problems need the IT team&rsquo;s own queue. It opens in a new tab.
+          </p>
+          <a
+            href={IT_HELPDESK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-disabled={IT_HELPDESK_URL === "#"}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-line px-4 py-2 text-[13.5px] font-semibold text-ink hover:border-ember/50 hover:text-ember"
+          >
+            Submit IT ticket <IconExternal size={14} />
+          </a>
+          {IT_HELPDESK_URL === "#" && (
+            <p className="mt-3 text-[12.5px] text-stone-500">The IT tool is still being built; this button will open it once it&rsquo;s live.</p>
+          )}
+        </section>
       </div>
 
-      <div className="mt-12">
-        <Reveal>
-          <h2 className="font-display text-[24px] font-semibold tracking-tight text-ink">My tickets</h2>
-          <p className="mt-1 text-sm text-stone-500">Raised by you, answered by support — the whole thread, here.</p>
-        </Reveal>
-        <div className="mt-6">
+      <section aria-labelledby="mine-h" className="mt-10">
+        <h2 id="mine-h" className="text-[17px] font-semibold text-ink">My tickets</h2>
+        <p className="mt-1 text-[13.5px] text-stone-600">Raise a general or WFM ticket and follow the whole thread here.</p>
+        <div className="mt-4">
           <TicketPanel />
         </div>
-      </div>
+      </section>
     </div>
   );
 }

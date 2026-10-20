@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { requireMe } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-/** GET /api/auth/me → the signed-in user, or 401. */
+/** GET /api/auth/me → the signed-in user with live level, department and permissions. */
 export async function GET() {
-  const user = await getSessionUser();
-  if (!user) return NextResponse.json({ error: "Sign in required." }, { status: 401 });
-  return NextResponse.json({ user });
+  const g = await requireMe();
+  if ("error" in g) return g.error;
+  return NextResponse.json({ user: g.me });
 }

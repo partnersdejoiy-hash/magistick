@@ -1,32 +1,21 @@
-import { notFound } from "next/navigation";
-import { sql, ensureSchema, rowToPost, type DbPost } from "@/lib/db";
+import { notFound, redirect } from "next/navigation";
+import { sql, rowToPost } from "@/lib/db";
+import { getMe } from "@/lib/auth";
 import ArticleView from "./ArticleView";
 
 export const dynamic = "force-dynamic";
 
-/** Single source of truth: posts live in Postgres now. */
+/** One update, only if it is company-wide or for the reader's department. */
 export default async function ArticlePage({ params }: { params: { slug: string } }) {
-  await ensureSchema();
-  const db = sql();
-  const rows = (await db`
-    SELECT id, slug, title, excerpt, category, author, date, body
-    FROM posts WHERE slug = ${params.slug} LIMIT 1
+  const me = await getMe();
+  if (!me) redirect(`/login?next=/updates/${params.slug}`);
+  const all = (await sql()`
+    SELECT id, slug, title, excerpt, category, author, date, body, audience
+    FROM posts WHERE audience = 'all' OR audience = ${me.department}
+    ORDER BY date DESC, created_at DESC
   `) as Record<string, unknown>[];
-  if (rows.length === 0) notFound();
-  const article: DbPost = rowToPost(rows[0]);
-
-  const all = (await db`
-    SELECT slug, title FROM posts ORDER BY date DESC, created_at DESC
-  `) as { slug: string; title: string }[];
   const idx = all.findIndex((r) => r.slug === params.slug);
-  const prev = idx > 0 ? all[idx - 1] : undefined;
-  const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : undefined;
-
-  return (
-    <ArticleView
-      article={article}
-      prev={prev ? ({ slug: prev.slug, title: prev.title } as DbPost) : undefined}
-      next={next ? ({ slug: next.slug, title: next.title } as DbPost) : undefined}
-    />
-  );
+  if (idx < 0) notFound();
+  const pick = (i: number) => (i >= 0 && i < all.length ? rowToPost(all[i]) : undefined);
+  return <ArticleView article={rowToPost(all[idx])} prev={pick(idx - 1)} next={pick(idx + 1)} />;
 }

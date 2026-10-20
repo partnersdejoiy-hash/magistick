@@ -1,28 +1,28 @@
-import UpdatesIndex from "@/components/UpdatesIndex";
-import ManagePostsLink from "@/components/ManagePostsLink";
-import { Reveal } from "@/components/motion";
+import Link from "next/link";
+import UpdatesFeed from "@/components/UpdatesFeed";
+import { getMe } from "@/lib/auth";
+import { IconPlus } from "@/components/icons";
 
 export const metadata = { title: "Updates — magistick" };
+export const dynamic = "force-dynamic";
 
-export default function UpdatesPage() {
+export default async function UpdatesPage() {
+  const me = await getMe().catch(() => null);
+  const canPublish = !!me?.perms.some((p) => p === "publish_posts_dept" || p === "publish_posts_all");
   return (
-    <div>
-      <Reveal>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-400">Bulletin</p>
-            <h1 className="mt-1 font-display text-[34px] font-semibold tracking-tight text-ink">Company updates</h1>
-            <p className="mt-2 max-w-xl text-[14.5px] leading-relaxed text-stone-600">
-              Announcements, IT notices and workforce news from across the BPO —
-              written by the teams, not the algorithm.
-            </p>
-          </div>
-          <ManagePostsLink />
+    <div className="mx-auto max-w-4xl">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[24px] font-semibold tracking-tight text-ink">Updates</h1>
+          <p className="mt-1 text-[14px] text-stone-600">Company-wide news, plus what your department is posting.</p>
         </div>
-      </Reveal>
-      <div className="mt-8">
-        <UpdatesIndex initialVisible={7} step={4} />
+        {canPublish && (
+          <Link href="/admin/posts" className="inline-flex items-center gap-1.5 rounded-lg bg-ember px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-nil">
+            <IconPlus size={15} /> Write an update
+          </Link>
+        )}
       </div>
+      <UpdatesFeed />
     </div>
   );
 }

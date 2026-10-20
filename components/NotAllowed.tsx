@@ -1,32 +1,17 @@
 import Link from "next/link";
-import { Reveal } from "@/components/motion";
-import { IconArrowLeft } from "@/components/icons";
 
-/**
- * Shown when the signed-in role lacks the capability for an admin surface.
- * Middleware + API routes enforce this server-side; this is the UI fallback.
- */
+/** Shown when the signed-in level lacks the permission for a surface. The API enforces it either way. */
 export default function NotAllowed({ what = "this area" }: { what?: string }) {
   return (
-    <Reveal>
-      <div className="mx-auto max-w-lg rounded-3xl border border-line bg-white/70 px-8 py-14 text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-400">
-          Restricted
-        </p>
-        <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink">
-          You can't open {what}
-        </h1>
-        <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-stone-500">
-          Your current role doesn't include this capability. Ask an admin to
-          change your role in <span className="font-medium text-ink">Admin → Team</span>.
-        </p>
-        <Link
-          href="/"
-          className="mt-7 inline-flex items-center gap-1.5 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ember hover:text-ink"
-        >
-          <IconArrowLeft size={14} /> Back home
-        </Link>
-      </div>
-    </Reveal>
+    <div className="mx-auto max-w-md rounded-xl border border-line bg-panel px-8 py-12 text-center">
+      <h1 className="text-[20px] font-semibold text-ink">You can&rsquo;t open {what}</h1>
+      <p className="mt-2 text-[14px] leading-relaxed text-stone-600">
+        Your level doesn&rsquo;t include this permission. If you need it, ask your manager; the Super Admin can change it in
+        Admin → Roles &amp; permissions.
+      </p>
+      <Link href="/" className="mt-6 inline-flex rounded-lg bg-ember px-4 py-2 text-[13.5px] font-semibold text-white hover:bg-nil">
+        Back home
+      </Link>
+    </div>
   );
 }

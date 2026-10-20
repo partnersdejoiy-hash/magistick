@@ -1,83 +1,106 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sql, ensureSchema } from "@/lib/db";
-import { getSessionUser, hashPassword, canAdminister } from "@/lib/auth";
-import type { RoleId } from "@/lib/roles";
+import { sql, logAudit } from "@/lib/db";
+import { requireMe, hashPassword } from "@/lib/auth";
+import { isDept, isLevel, LEVEL_BY_ID, DEPT_BY_ID } from "@/lib/rbac";
+import { chainFrom, loadPeople, mayManage, type Person } from "@/lib/people";
 
 export const dynamic = "force-dynamic";
 
-const VALID_ROLES: RoleId[] = ["admin", "collaborator", "employee"];
+const MANAGE = ["manage_users_team", "manage_users_dept", "manage_users_all"] as const;
 
-async function guard() {
-  const user = await getSessionUser();
-  if (!user) return { error: NextResponse.json({ error: "Sign in required." }, { status: 401 }) };
-  if (!canAdminister(user.role)) {
-    return { error: NextResponse.json({ error: "Admins only." }, { status: 403 }) };
+async function load(id: string) {
+  const g = await requireMe([...MANAGE]);
+  if ("error" in g) return g;
+  const people = await loadPeople();
+  const byId = new Map(people.map((p) => [p.id, p]));
+  const target = byId.get(id);
+  if (!target) return { error: NextResponse.json({ error: "Not found." }, { status: 404 }) };
+  if (target.id === g.me.id) {
+    return { error: NextResponse.json({ error: "You can't change your own account here." }, { status: 400 }) };
   }
-  await ensureSchema();
-  return { user };
+  if (!mayManage(g.me, target, byId)) {
+    return { error: NextResponse.json({ error: "That person is outside your scope." }, { status: 403 }) };
+  }
+  return { me: g.me, target, byId };
 }
 
-/** PATCH /api/admin/users/[id] { name?, role?, password? } */
+/** PATCH /api/admin/users/[id] { name?, title?, level?, department?, manager_id?, location?, status?, password? } */
 export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
-  const g = await guard();
-  if (g.error) return g.error;
-  let body: { name?: string; role?: string; password?: string };
+  const l = await load(ctx.params.id);
+  if ("error" in l) return l.error;
+  const { me, target, byId } = l;
+  let b: Record<string, unknown>;
   try {
-    body = await req.json();
+    b = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const updates: string[] = [];
-  const params: unknown[] = [];
-  let i = 1;
+  const next: Person = { ...target };
+  if (typeof b.name === "string" && b.name.trim()) next.name = b.name.trim();
+  if (typeof b.title === "string") next.title = b.title.trim();
+  if (typeof b.location === "string") next.location = b.location.trim();
+  if (b.level !== undefined) {
+    if (!isLevel(b.level) || b.level === "super_admin") {
+      return NextResponse.json({ error: "Invalid level." }, { status: 400 });
+    }
+    next.level = b.level;
+  }
+  if (b.department !== undefined) {
+    if (!isDept(b.department)) return NextResponse.json({ error: "Invalid department." }, { status: 400 });
+    next.department = b.department;
+  }
+  if (b.status !== undefined) {
+    if (b.status !== "active" && b.status !== "suspended") {
+      return NextResponse.json({ error: "Invalid status." }, { status: 400 });
+    }
+    next.status = b.status;
+  }
+  if (b.manager_id !== undefined) {
+    const mid = b.manager_id ? String(b.manager_id) : null;
+    if (mid && !byId.has(mid)) return NextResponse.json({ error: "Manager not found." }, { status: 400 });
+    if (mid && (mid === target.id || chainFrom(mid, byId).some((p) => p.id === target.id))) {
+      return NextResponse.json({ error: "That would make a reporting loop." }, { status: 400 });
+    }
+    next.manager_id = mid;
+  }
+  // The result must still be inside the caller's scope (no promoting past yourself).
+  if (!mayManage(me, next, byId)) {
+    return NextResponse.json({ error: "That change would move them outside your scope." }, { status: 403 });
+  }
 
-  if (typeof body.name === "string" && body.name.trim()) {
-    updates.push(`name = $${i++}`);
-    params.push(body.name.trim());
-  }
-  if (typeof body.role === "string") {
-    if (!VALID_ROLES.includes(body.role as RoleId)) {
-      return NextResponse.json({ error: "Invalid role." }, { status: 400 });
-    }
-    if (ctx.params.id === g.user!.id && body.role !== "admin") {
-      return NextResponse.json({ error: "You can't demote yourself." }, { status: 400 });
-    }
-    updates.push(`role = $${i++}`);
-    params.push(body.role);
-  }
-  if (typeof body.password === "string" && body.password) {
-    if (body.password.length < 8) {
+  let password_hash: string | null = null;
+  if (typeof b.password === "string" && b.password) {
+    if (b.password.length < 8) {
       return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
     }
-    updates.push(`password_hash = $${i++}`);
-    params.push(await hashPassword(body.password));
+    password_hash = await hashPassword(b.password);
   }
-  if (updates.length === 0) return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
 
-  const db = sql();
-  params.push(ctx.params.id);
-  // Column names are fixed literals above — only values are parameterized.
-  await db.query(`UPDATE users SET ${updates.join(", ")} WHERE id = $${i}`, params);
+  await sql()`
+    UPDATE users SET name = ${next.name}, title = ${next.title}, location = ${next.location},
+      role = ${next.level}, department = ${next.department}, status = ${next.status},
+      manager_id = ${next.manager_id},
+      password_hash = COALESCE(${password_hash}, password_hash)
+    WHERE id = ${target.id}`;
 
-  const rows = (await db`SELECT id, email, name, role FROM users WHERE id = ${ctx.params.id} LIMIT 1`) as {
-    id: string;
-    email: string;
-    name: string;
-    role: RoleId;
-  }[];
-  if (rows.length === 0) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  return NextResponse.json({ user: rows[0] });
+  const changes: string[] = [];
+  if (next.level !== target.level) changes.push(`level ${LEVEL_BY_ID[target.level].label} → ${LEVEL_BY_ID[next.level].label}`);
+  if (next.department !== target.department) changes.push(`dept ${DEPT_BY_ID[target.department].label} → ${DEPT_BY_ID[next.department].label}`);
+  if (next.status !== target.status) changes.push(`status ${next.status}`);
+  if (next.manager_id !== target.manager_id) changes.push(`manager ${next.manager_id ? byId.get(next.manager_id)!.name : "none"}`);
+  if (password_hash) changes.push("password reset");
+  await logAudit(me, "user.update", target.name, changes.join("; ") || "profile");
+  return NextResponse.json({ ok: true });
 }
 
-/** DELETE /api/admin/users/[id] */
+/** DELETE /api/admin/users/[id] — permanent; direct reports move up to the removed person's manager. */
 export async function DELETE(_req: NextRequest, ctx: { params: { id: string } }) {
-  const g = await guard();
-  if (g.error) return g.error;
-  if (ctx.params.id === g.user!.id) {
-    return NextResponse.json({ error: "You can't delete yourself." }, { status: 400 });
-  }
+  const l = await load(ctx.params.id);
+  if ("error" in l) return l.error;
   const db = sql();
-  await db`DELETE FROM users WHERE id = ${ctx.params.id}`;
+  await db`UPDATE users SET manager_id = ${l.target.manager_id} WHERE manager_id = ${l.target.id}`;
+  await db`DELETE FROM users WHERE id = ${l.target.id}`;
+  await logAudit(l.me, "user.delete", l.target.name);
   return NextResponse.json({ ok: true });
 }

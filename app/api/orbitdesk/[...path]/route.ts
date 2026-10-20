@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { proxyToOrbitDesk } from "@/lib/orbitdesk";
-import { getSessionUser } from "@/lib/auth";
+import { requireMe } from "@/lib/auth";
 
 /**
  * GET/POST/PATCH /api/orbitdesk/[...path] → OrbitDesk /api/[...path]
  * Server-side only: the browser never sees OrbitDesk credentials or tokens.
- * Requires a signed-in magistick user (any role).
+ * Requires a signed-in user whose level may raise tickets.
  */
 async function handle(req: NextRequest, ctx: { params: { path: string[] } }) {
-  const user = await getSessionUser();
-  if (!user) {
-    return NextResponse.json({ error: "Sign in required." }, { status: 401 });
-  }
+  const g = await requireMe(["raise_tickets"]);
+  if ("error" in g) return g.error;
 
   const subPath = (ctx.params.path ?? []).join("/");
   if (!subPath) {

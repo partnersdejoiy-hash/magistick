@@ -2,14 +2,13 @@
 
 import { MotionConfig } from "framer-motion";
 import type { ReactNode } from "react";
-import SmoothScroll from "./SmoothScroll";
+import { SessionProvider } from "@/lib/roles";
 
-/** Global motion provider — honors the OS reduced-motion setting. */
+/** Session context + reduced-motion respect for the whole app. */
 export default function Providers({ children }: { children: ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
-      <SmoothScroll />
-      {children}
+      <SessionProvider>{children}</SessionProvider>
     </MotionConfig>
   );
 }

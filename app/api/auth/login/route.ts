@@ -7,7 +7,7 @@ import {
   verifyPassword,
   type SessionUser,
 } from "@/lib/auth";
-import type { RoleId } from "@/lib/roles";
+import { isLevel } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
@@ -46,9 +46,9 @@ export async function POST(req: NextRequest) {
 
   const db = sql();
   const rows = (await db`
-    SELECT id, email, name, password_hash, role FROM users
+    SELECT id, email, name, password_hash, role, status FROM users
     WHERE lower(email) = ${email} LIMIT 1
-  `) as { id: string; email: string; name: string; password_hash: string; role: RoleId }[];
+  `) as { id: string; email: string; name: string; password_hash: string; role: string; status: string }[];
 
   if (rows.length === 0) {
     return NextResponse.json({ error: "No account for that email." }, { status: 401 });
@@ -58,6 +58,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Wrong password. Try again." }, { status: 401 });
   }
 
+  if (row.status !== "active" || !isLevel(row.role)) {
+    return NextResponse.json({ error: "This account is suspended. Contact your manager or HR." }, { status: 403 });
+  }
   const user: SessionUser = { id: row.id, email: row.email, name: row.name, role: row.role };
   const token = await signSession(user);
   setSessionCookie(token);

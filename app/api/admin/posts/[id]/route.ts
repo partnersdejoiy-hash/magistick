@@ -1,24 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sql, ensureSchema, rowToPost } from "@/lib/db";
-import { getSessionUser, canManagePosts } from "@/lib/auth";
+import { sql, rowToPost, logAudit } from "@/lib/db";
+import { requireMe, allowedAudience } from "@/lib/auth";
 import type { PostInput } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-async function guard() {
-  const user = await getSessionUser();
-  if (!user) return { error: NextResponse.json({ error: "Sign in required." }, { status: 401 }) };
-  if (!canManagePosts(user.role)) {
-    return { error: NextResponse.json({ error: "Not allowed for your role." }, { status: 403 }) };
+/** The post exists and this publisher may touch it (dept publishers: own department only). */
+async function guard(id: string) {
+  const g = await requireMe(["publish_posts_dept", "publish_posts_all"]);
+  if ("error" in g) return g;
+  const rows = (await sql()`SELECT audience, title FROM posts WHERE id = ${id} LIMIT 1`) as {
+    audience: string;
+    title: string;
+  }[];
+  if (rows.length === 0) return { error: NextResponse.json({ error: "Not found." }, { status: 404 }) };
+  if (!g.me.perms.includes("publish_posts_all") && rows[0].audience !== g.me.department) {
+    return { error: NextResponse.json({ error: "That post belongs to another audience." }, { status: 403 }) };
   }
-  await ensureSchema();
-  return {};
+  return { me: g.me, title: rows[0].title };
 }
 
 /** PATCH /api/admin/posts/[id] → update. */
 export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
-  const g = await guard();
-  if (g.error) return g.error;
+  const g = await guard(ctx.params.id);
+  if ("error" in g) return g.error;
   let input: Partial<PostInput>;
   try {
     input = await req.json();
@@ -42,6 +47,12 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
     updates.push(`date = $${i++}`);
     params.push(input.date);
   }
+  if (input.audience !== undefined) {
+    const audience = allowedAudience(g.me, input.audience);
+    if (!audience) return NextResponse.json({ error: "You can only publish to your own department." }, { status: 403 });
+    updates.push(`audience = $${i++}`);
+    params.push(audience);
+  }
   if (Array.isArray(input.body)) {
     updates.push(`body = $${i++}`);
     params.push(JSON.stringify(input.body.map((p) => String(p).trim()).filter(Boolean)));
@@ -52,8 +63,9 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
   const db = sql();
   params.push(ctx.params.id);
   await db.query(`UPDATE posts SET ${updates.join(", ")} WHERE id = $${i}`, params);
+  await logAudit(g.me, "post.edit", g.title);
   const rows = (await db`
-    SELECT id, slug, title, excerpt, category, author, date, body
+    SELECT id, slug, title, excerpt, category, author, date, body, audience
     FROM posts WHERE id = ${ctx.params.id} LIMIT 1
   `) as Record<string, unknown>[];
   if (rows.length === 0) return NextResponse.json({ error: "Not found." }, { status: 404 });
@@ -62,9 +74,9 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
 
 /** DELETE /api/admin/posts/[id] */
 export async function DELETE(_req: NextRequest, ctx: { params: { id: string } }) {
-  const g = await guard();
-  if (g.error) return g.error;
-  const db = sql();
-  await db`DELETE FROM posts WHERE id = ${ctx.params.id}`;
+  const g = await guard(ctx.params.id);
+  if ("error" in g) return g.error;
+  await sql()`DELETE FROM posts WHERE id = ${ctx.params.id}`;
+  await logAudit(g.me, "post.delete", g.title);
   return NextResponse.json({ ok: true });
 }
