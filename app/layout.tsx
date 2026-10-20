@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Header from "@/components/Header";
 import Providers from "@/components/Providers";
+import { UI_PREVIEW } from "@/lib/preview";
 import "./globals.css";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -22,6 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           >
             Skip to main content
           </a>
+          {UI_PREVIEW && (
+            <div className="bg-gold px-4 py-1 text-center text-[12.5px] font-semibold text-ink">
+              Preview mode — read-only, sign-in is off
+            </div>
+          )}
           <Header />
           <main id="main" className="mx-auto w-full max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
             {children}

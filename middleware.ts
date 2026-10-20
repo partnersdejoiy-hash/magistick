@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
 import { isLevel } from "./lib/rbac";
+import { UI_PREVIEW } from "./lib/preview";
 
 /**
  * Gate: every route except /login + /api/auth/login needs a valid session.
@@ -26,6 +27,14 @@ async function signedIn(req: NextRequest): Promise<boolean> {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  if (UI_PREVIEW) {
+    const write = !["GET", "HEAD", "OPTIONS"].includes(req.method);
+    if (write && pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Preview mode is read-only" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
 
   // Static assets, login page, and the login API stay public.
   if (

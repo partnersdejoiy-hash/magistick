@@ -4,7 +4,8 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { sql, ensureSchema } from "./db";
-import { buildMatrix, isDept, isLevel, type DeptId, type LevelId, type Matrix, type PermId } from "./rbac";
+import { UI_PREVIEW } from "./preview";
+import { buildMatrix, isDept, isLevel, PERM_IDS, type DeptId, type LevelId, type Matrix, type PermId } from "./rbac";
 
 /**
  * Session auth for magistick phase 2 — email + password, server-side sessions.
@@ -112,6 +113,19 @@ export async function loadMatrix(): Promise<Matrix> {
 }
 
 export async function getMe(): Promise<Me | null> {
+  if (UI_PREVIEW) {
+    return {
+      id: "ui-preview",
+      email: "preview@magistick.local",
+      name: "Preview Admin",
+      level: "super_admin",
+      department: "leadership",
+      title: "",
+      manager_id: null,
+      location: "",
+      perms: [...PERM_IDS],
+    };
+  }
   const s = await getSessionUser();
   if (!s) return null;
   await ensureSchema();
