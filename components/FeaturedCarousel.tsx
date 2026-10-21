@@ -84,7 +84,7 @@ export default function FeaturedCarousel() {
         {/* The wand's star, glowing on the right. */}
         <div aria-hidden className="relative hidden h-full min-h-[200px] items-center justify-center md:flex">
           <span className="absolute h-44 w-44 rounded-full bg-gold/30 blur-3xl" />
-          <svg viewBox="0 0 16 16" className="logo-glint relative h-32 w-32 rounded-3xl text-gold drop-shadow-[0_0_24px_rgba(255,196,0,0.7)]">
+          <svg viewBox="0 0 16 16" className="relative h-32 w-32 animate-[twinkle_4s_ease-in-out_infinite] text-gold drop-shadow-[0_0_24px_rgba(255,196,0,0.7)] motion-reduce:animate-none">
             <path d="M8 0l1.9 6.1L16 8l-6.1 1.9L8 16l-1.9-6.1L0 8l6.1-1.9z" fill="currentColor" />
           </svg>
         </div>
