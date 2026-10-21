@@ -247,7 +247,7 @@ function Search() {
   return (
     <form
       role="search"
-      className="relative hidden md:block"
+      className="relative hidden md:block lg:hidden xl:block"
       onSubmit={(e) => {
         e.preventDefault();
         if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
@@ -259,7 +259,7 @@ function Search() {
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search apps, people, updates"
         aria-label="Search apps, people and updates"
-        className="on-nil h-9 w-64 rounded-md border border-white/10 bg-nil-2 pl-9 pr-3 text-[13px] text-white placeholder:text-white/55 focus:border-gold/70 focus:outline-none lg:w-40 xl:w-72"
+        className="on-nil h-9 w-64 rounded-md border border-white/10 bg-nil-2 pl-9 pr-3 text-[13px] text-white placeholder:text-white/55 focus:border-gold/70 focus:outline-none xl:w-52 2xl:w-72"
       />
     </form>
   );
@@ -296,7 +296,7 @@ export default function Header() {
                   key={it.href}
                   href={it.href}
                   aria-current={active(it.href) ? "page" : undefined}
-                  className={`on-nil relative flex items-center px-2.5 text-[13.5px] font-medium transition-colors xl:px-3 ${
+                  className={`on-nil relative flex items-center whitespace-nowrap px-2.5 text-[13.5px] font-medium transition-colors xl:px-3 ${
                     active(it.href) ? "text-white" : "text-white/70 hover:text-white"
                   }`}
                 >
@@ -316,7 +316,14 @@ export default function Header() {
           {signedIn && (
             <div className="ml-auto flex items-center gap-2">
               <Search />
-              <div className="hidden sm:block">
+              <Link
+                href="/search"
+                aria-label="Search"
+                className="on-nil hidden h-9 w-9 items-center justify-center rounded-md text-white/80 hover:bg-white/10 hover:text-white lg:flex xl:hidden"
+              >
+                <IconSearch size={17} />
+              </Link>
+              <div className="hidden sm:block lg:hidden 2xl:block">
                 <QuickLinks />
               </div>
               <UserMenu />
