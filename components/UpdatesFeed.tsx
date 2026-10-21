@@ -117,7 +117,7 @@ export default function UpdatesFeed({ limit, showFilters = true }: { limit?: num
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-panel">
+        <ul className="glow-card glow-flat divide-y divide-line overflow-hidden rounded-xl border border-line bg-panel">
           {shown.map((p, i) => (
             <li key={p.id}>
               <Link href={`/updates/${p.slug}`} className="group block px-5 py-4 transition-colors hover:bg-ground/70">

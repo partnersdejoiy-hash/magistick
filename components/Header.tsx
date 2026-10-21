@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -73,7 +74,13 @@ function QuickLinks() {
         Quick links <IconChevronDown size={14} />
       </button>
       {open && (
-        <div role="menu" className="absolute right-0 top-11 z-50 w-72 overflow-hidden rounded-xl border border-line bg-panel py-1.5 shadow-lift">
+        <motion.div
+          role="menu"
+          initial={{ opacity: 0, y: -6, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute right-0 top-11 z-50 w-72 origin-top-right overflow-hidden rounded-xl border border-line bg-panel py-1.5 shadow-lift"
+        >
           {apps === null ? (
             <div className="space-y-2 p-3">
               <div className="skeleton h-4 w-3/4" />
@@ -99,7 +106,7 @@ function QuickLinks() {
               </a>
             ))
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   );
@@ -186,15 +193,15 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="bg-nil text-white">
-        <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="stars relative bg-nil text-white">
+        <div className="relative mx-auto flex h-14 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
           <Link href="/" className="on-nil flex shrink-0 items-center gap-2 rounded-md" aria-label="magistick home">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gold">
+            <span className="logo-glint flex h-7 w-7 items-center justify-center rounded-md bg-gold">
               <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
                 <path d="M8 0l1.9 6.1L16 8l-6.1 1.9L8 16l-1.9-6.1L0 8l6.1-1.9z" fill="#1B2250" />
               </svg>
             </span>
-            <span className="text-[17px] font-semibold tracking-tight">magistick</span>
+            <span className="font-display text-[19px] font-semibold tracking-tight">magistick</span>
           </Link>
 
           {signedIn && (
@@ -209,7 +216,13 @@ export default function Header() {
                   }`}
                 >
                   {it.label}
-                  {active(it.href) && <span className="absolute inset-x-3 bottom-0 h-[3px] rounded-t bg-gold" />}
+                  {active(it.href) && (
+                    <motion.span
+                      layoutId="nav-glow"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                      className="absolute inset-x-3 bottom-0 h-[3px] rounded-t bg-gold shadow-[0_0_12px_2px_rgba(255,196,0,0.6)]"
+                    />
+                  )}
                 </Link>
               ))}
             </nav>
