@@ -93,3 +93,27 @@ Trade-offs (honest):
    `ORBITDESK_SERVICE_EMAIL`, `ORBITDESK_SERVICE_PASSWORD` (sensitive).
 3. Flip the `/help` page from "not connected" to live; verify create → appears
    in OrbitDesk; verify comment round-trips.
+
+## Phase 3 (2026-10-22): Get Help ↔ OrbitDesk, scoped per employee
+
+The open catch-all proxy (`/api/orbitdesk/[...path]`) is **removed**: it let any
+signed-in employee call any OrbitDesk endpoint as the shared account (and list
+every ticket that account could see). It is replaced by four scoped routes:
+
+| Route | Does |
+|---|---|
+| `GET /api/helpdesk/tickets` | The caller's own tickets from `helpdesk_tickets` (ownership table); open ones re-synced from OrbitDesk every 2 min, max 10 per call |
+| `POST /api/helpdesk/tickets` | Validates category/subcategory (`lib/helpdesk.ts`), creates in OrbitDesk with `category`, `subcategory`, `raisedForUserId` (employee's OrbitDesk account, matched by email), `raisedForName/Email`, department by name, tag `magistick`; stores ownership |
+| `GET /api/helpdesk/tickets/:id` | Only if the caller owns it; returns status, team, assignee, SLA, timeline, and **public replies only** (`isInternal === false`) |
+| `POST /api/helpdesk/tickets/:id/reply` | Only if the caller owns it and it isn't closed; posts a public comment prefixed `Reply from <name>:` |
+
+OrbitDesk side (repo Enterprise-Ticketing, branch `magistick-ticket-categories`):
+`tickets.category` / `tickets.subcategory` columns (migration 015 + idempotent
+startup patch), accepted on create/patch, list filter + `/api/tickets/categories`,
+shown in the agent list and ticket sidebar.
+
+Agents work tickets in OrbitDesk as before; magistick reflects status and public
+replies (polling; OrbitDesk has no outbound webhooks yet).
+
+Recommended integration account: an OrbitDesk `employee`-role user with
+`canCreateTicket` and no direct reports, password changed after first login.

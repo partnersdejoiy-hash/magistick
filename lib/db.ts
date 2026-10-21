@@ -91,6 +91,25 @@ const SCHEMA_STATEMENTS = [
   // Old 3-role model → BPO ladder (idempotent: only touches old ids).
   `UPDATE users SET role = 'team_leader' WHERE role = 'collaborator'`,
   `UPDATE users SET role = 'associate' WHERE role = 'employee'`,
+  // Get Help: which magistick user raised which OrbitDesk ticket (ownership +
+  // a cached status so "My tickets" loads without calling OrbitDesk each time).
+  `CREATE TABLE IF NOT EXISTS helpdesk_tickets (
+     orbit_id INTEGER PRIMARY KEY,
+     ticket_number TEXT NOT NULL,
+     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+     category TEXT NOT NULL,
+     subcategory TEXT NOT NULL,
+     subject TEXT NOT NULL,
+     status TEXT NOT NULL DEFAULT 'open',
+     priority TEXT NOT NULL DEFAULT 'medium',
+     assignee TEXT NOT NULL DEFAULT '',
+     department TEXT NOT NULL DEFAULT '',
+     sla_deadline TEXT,
+     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+     synced_at TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS helpdesk_tickets_user_idx ON helpdesk_tickets (user_id, created_at DESC)`,
   // App access: carry each old role's choice to the levels that replaced it.
   `INSERT INTO app_permissions (app_id, role, allowed)
    SELECT p.app_id, m.level, p.allowed FROM app_permissions p
