@@ -7,6 +7,7 @@ import type { DeptId, LevelId } from "@/lib/rbac";
 import AppRail from "./AppRail";
 import FeaturedCarousel from "./FeaturedCarousel";
 import PolicyHighlights from "./PolicyHighlights";
+import FounderQuote from "./FounderQuote";
 import UpdatesFeed from "./UpdatesFeed";
 import { Avatar, DeptTag, LevelTag } from "./Stamp";
 import { IconArrowRight, IconExternal, IconTicket, IconPeople, IconBook } from "./icons";
@@ -92,6 +93,8 @@ export default function HomeView() {
       <FeaturedCarousel />
 
       <PolicyHighlights />
+
+      <FounderQuote />
 
       <div className="grid gap-8 lg:grid-cols-3">
         <section aria-labelledby="upd-h" className="lg:col-span-2">
