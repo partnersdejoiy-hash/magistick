@@ -62,9 +62,10 @@ export default function TeamChart() {
     return { byId, kids, roots };
   }, [people]);
 
-  // Open the top two levels on first load.
+  // Open everything for a small org; for a big one, just the top two levels.
   useEffect(() => {
     if (!people) return;
+    if (people.length <= 60) return setOpen(new Set(Array.from(kids.keys())));
     const start = new Set<string>();
     for (const r of roots) {
       start.add(r.id);
@@ -123,8 +124,8 @@ export default function TeamChart() {
           <Link href={`/directory?id=${p.id}`} className="flex items-center gap-2.5">
             <Avatar id={p.id} name={p.name} dept={p.department} size={42} />
             <span className="min-w-0">
-              <span className="block truncate text-[13.5px] font-semibold text-ink">{p.name}</span>
-              <span className="block truncate text-[11.5px] text-stone-500">{p.title || LEVEL_BY_ID[p.level].label}</span>
+              <span className="line-clamp-2 text-[13.5px] font-semibold leading-tight text-ink">{p.name}</span>
+              <span className="mt-0.5 line-clamp-2 text-[11.5px] leading-snug text-stone-500">{p.title || LEVEL_BY_ID[p.level].label}</span>
             </span>
           </Link>
           <div className="mt-2 flex items-center justify-between gap-2">
