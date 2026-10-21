@@ -36,34 +36,56 @@ export default function HomeView() {
 
   return (
     <div className="space-y-10">
-      <section aria-labelledby="hello" className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          {user ? <Avatar name={user.name} dept={user.department} size={52} /> : <span className="skeleton h-[52px] w-[52px] rounded-full" />}
-          <div>
-            <h1 id="hello" className="text-[24px] font-semibold tracking-tight text-ink">
-              {greeting()}
-              {user ? `, ${user.name.split(" ")[0]}` : ""}
-            </h1>
-            {user && (
-              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[13px] text-stone-600">
-                <LevelTag level={user.level} />
-                <DeptTag dept={user.department} />
-                {user.title && <span>{user.title}</span>}
-                {manager && (
-                  <Link href={`/directory?id=${manager.id}`} className="text-stone-600 underline decoration-line hover:text-ember">
-                    Reports to {manager.name}
-                  </Link>
-                )}
-              </div>
+      <section
+        aria-labelledby="hello"
+        className="stars relative isolate overflow-hidden rounded-3xl bg-nil px-5 py-8 text-white shadow-lift sm:px-8 sm:py-10"
+      >
+        {/* Aurora: two slow-drifting glows behind the greeting. */}
+        <span aria-hidden className="animate-drift-a absolute -left-24 -top-32 -z-10 h-80 w-80 rounded-full bg-gold/30 blur-3xl" />
+        <span aria-hidden className="animate-drift-b absolute -bottom-40 right-0 -z-10 h-96 w-96 rounded-full bg-nil-4/70 blur-3xl" />
+        <div className="relative flex flex-wrap items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            {user ? (
+              <span className="rounded-full p-1 shadow-[0_0_24px_2px_rgba(255,196,0,0.35)] ring-1 ring-gold/50">
+                <Avatar name={user.name} dept={user.department} size={56} />
+              </span>
+            ) : (
+              <span className="h-[64px] w-[64px] animate-pulse rounded-full bg-white/10" />
             )}
+            <div>
+              <h1 id="hello" className="text-[28px] font-semibold leading-tight sm:text-[34px]">
+                {greeting()}
+                {user ? (
+                  <>
+                    , <span className="bg-gradient-to-r from-gold via-[#FFD86B] to-[#FFF1C2] bg-clip-text text-transparent">{user.name.split(" ")[0]}</span>
+                  </>
+                ) : (
+                  ""
+                )}
+              </h1>
+              {user && (
+                <div className="mt-2.5 flex flex-wrap items-center gap-2 text-[13px] text-white/75">
+                  <LevelTag level={user.level} />
+                  <span className="rounded-md bg-white">
+                    <DeptTag dept={user.department} />
+                  </span>
+                  {user.title && <span>{user.title}</span>}
+                  {manager && (
+                    <Link href={`/directory?id=${manager.id}`} className="text-white/75 underline decoration-white/30 hover:text-gold">
+                      Reports to {manager.name}
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
+          <Link
+            href="/help"
+            className="btn-magic inline-flex items-center gap-2 rounded-xl bg-gold px-5 py-3 text-[14px] font-semibold text-nil hover:bg-[#FFD86B]"
+          >
+            <IconTicket size={16} /> Raise a ticket
+          </Link>
         </div>
-        <Link
-          href="/help"
-          className="inline-flex items-center gap-2 rounded-lg bg-ember px-4 py-2.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-nil"
-        >
-          <IconTicket size={16} /> Raise a ticket
-        </Link>
       </section>
 
       <div className="grid gap-8 lg:grid-cols-3">
@@ -79,7 +101,7 @@ export default function HomeView() {
 
         <aside aria-label="Shortcuts" className="space-y-3">
           <h2 className="text-[17px] font-semibold text-ink">Need something?</h2>
-          <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-panel text-[13.5px]">
+          <ul className="glow-card glow-flat divide-y divide-line overflow-hidden rounded-xl border border-line bg-panel text-[13.5px]">
             <li>
               <Link href="/help" className="flex items-center gap-3 px-4 py-3 hover:bg-ground">
                 <IconTicket size={17} className="text-stone-500" />

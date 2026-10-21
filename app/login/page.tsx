@@ -43,9 +43,11 @@ function LoginForm() {
 
   return (
     <div className="mx-auto grid min-h-[72vh] max-w-5xl items-stretch overflow-hidden rounded-2xl border border-line bg-panel shadow-card md:grid-cols-[1fr_1.1fr]">
-      <div className="relative hidden flex-col justify-between bg-nil p-8 text-white md:flex">
+      <div className="stars relative isolate hidden flex-col justify-between overflow-hidden bg-nil p-8 text-white md:flex">
+        <span aria-hidden className="animate-drift-a absolute -left-20 -top-24 -z-10 h-72 w-72 rounded-full bg-gold/30 blur-3xl" />
+        <span aria-hidden className="animate-drift-b absolute -bottom-32 -right-16 -z-10 h-80 w-80 rounded-full bg-nil-4/70 blur-3xl" />
         <div>
-          <p className="text-[22px] font-semibold tracking-tight">magistick</p>
+          <p className="font-display text-[30px] font-semibold tracking-tight">magistick</p>
           <p className="mt-2 max-w-xs text-[14px] leading-relaxed text-white/75">
             One front door for DEJOIY: your apps, your department&rsquo;s updates, your reporting line and your tickets.
           </p>
@@ -64,7 +66,7 @@ function LoginForm() {
 
       <div className="flex items-center justify-center px-6 py-12 sm:px-10">
         <form onSubmit={submit} className="w-full max-w-sm" noValidate>
-          <h1 className="text-[22px] font-semibold tracking-tight text-ink">Sign in</h1>
+          <h1 className="text-[26px] font-semibold tracking-tight text-ink">Sign in</h1>
           <p className="mt-1 text-[14px] text-stone-600">Use your DEJOIY work email.</p>
           {error && (
             <p role="alert" className="mt-5 rounded-lg border border-bad/30 bg-bad-tint px-3.5 py-2.5 text-[13.5px] text-bad">
@@ -97,7 +99,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={busy}
-            className="mt-6 h-11 w-full rounded-lg bg-ember text-[14px] font-semibold text-white transition-colors hover:bg-nil disabled:cursor-wait disabled:opacity-60"
+            className="btn-magic mt-6 h-11 w-full rounded-lg bg-ember text-[14px] font-semibold text-white hover:bg-nil disabled:cursor-wait disabled:opacity-60"
           >
             {busy ? "Signing in…" : "Sign in"}
           </button>

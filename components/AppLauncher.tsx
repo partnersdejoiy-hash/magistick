@@ -101,9 +101,11 @@ export default function AppLauncher({ limit }: { limit?: number }) {
               href={app.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-full items-center gap-3 rounded-xl border border-line bg-panel p-3.5 pr-10 transition-[border-color,box-shadow] duration-150 hover:border-ember/40 hover:shadow-card"
+              className="glow-card flex h-full items-center gap-3 rounded-xl border border-line bg-panel p-3.5 pr-10"
             >
-              <AppGlyph app={app} />
+              <span className="transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
+                <AppGlyph app={app} />
+              </span>
               <span className="min-w-0">
                 <span className="block truncate text-[14px] font-semibold text-ink">{app.name}</span>
                 <span className="block truncate text-[12.5px] text-stone-500">{app.blurb || app.category}</span>

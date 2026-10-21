@@ -1,5 +1,5 @@
 /**
- * Motion vocabulary. A work portal moves only to show state change:
- * 150–250ms, exponential ease-out. No entrance choreography.
+ * Motion vocabulary: exponential ease-out everywhere. Page-level magic
+ * (scroll reveals, glowstick bar, sparkles) lives in components/Magic.tsx.
  */
 export const EASE = [0.16, 1, 0.3, 1] as const;
