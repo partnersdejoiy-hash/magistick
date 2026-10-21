@@ -14,6 +14,7 @@ const NAV = [
   { href: "/apps", label: "Apps" },
   { href: "/updates", label: "Updates" },
   { href: "/directory", label: "Directory" },
+  { href: "/policies", label: "Policies" },
   { href: "/help", label: "Get Help" },
   { href: "/new-hire", label: "New Hire" },
 ];
