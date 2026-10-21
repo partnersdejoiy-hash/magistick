@@ -125,6 +125,7 @@ export async function getMe(): Promise<Me | null> {
       title: "",
       manager_id: null,
       location: "",
+      photo_at: 0,
       perms: [...PERM_IDS],
     };
   }
