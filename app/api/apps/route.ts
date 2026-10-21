@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sql, type DbApp } from "@/lib/db";
 import { requireMe } from "@/lib/auth";
+import { PREVIEW_APPS, UI_PREVIEW } from "@/lib/preview";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,7 @@ export async function GET() {
   const g = await requireMe();
   if ("error" in g) return g.error;
   const { level, department } = g.me;
+  if (UI_PREVIEW) return NextResponse.json({ apps: PREVIEW_APPS });
   const rows = (await sql()`
     SELECT a.id, a.name, a.blurb, a.category, a.href, a.icon, a.color, a.sort_order
     FROM apps a
