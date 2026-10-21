@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession } from "@/lib/roles";
 import type { DeptId, LevelId } from "@/lib/rbac";
-import AppLauncher from "./AppLauncher";
+import AppRail from "./AppRail";
+import FeaturedCarousel from "./FeaturedCarousel";
 import UpdatesFeed from "./UpdatesFeed";
 import { Avatar, DeptTag, LevelTag } from "./Stamp";
 import { IconArrowRight, IconExternal, IconTicket, IconPeople, IconBook } from "./icons";
@@ -35,73 +36,76 @@ export default function HomeView() {
   }, [user]);
 
   return (
-    <div className="space-y-10">
-      <section
-        aria-labelledby="hello"
-        className="stars relative isolate overflow-hidden rounded-3xl bg-nil px-5 py-8 text-white shadow-lift sm:px-8 sm:py-10"
-      >
-        {/* Aurora: two slow-drifting glows behind the greeting. */}
-        <span aria-hidden className="animate-drift-a absolute -left-24 -top-32 -z-10 h-80 w-80 rounded-full bg-gold/30 blur-3xl" />
-        <span aria-hidden className="animate-drift-b absolute -bottom-40 right-0 -z-10 h-96 w-96 rounded-full bg-nil-4/70 blur-3xl" />
-        <div className="relative flex flex-wrap items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            {user ? (
-              <span className="rounded-full p-1 shadow-[0_0_24px_2px_rgba(255,196,0,0.35)] ring-1 ring-gold/50">
-                <Avatar id={user.id} v={user.photo_at} name={user.name} dept={user.department} size={56} />
-              </span>
-            ) : (
-              <span className="h-[64px] w-[64px] animate-pulse rounded-full bg-white/10" />
-            )}
-            <div>
-              <h1 id="hello" className="text-[28px] font-semibold leading-tight sm:text-[34px]">
-                {greeting()}
-                {user ? (
-                  <>
-                    , <span className="bg-gradient-to-r from-gold via-[#FFD86B] to-[#FFF1C2] bg-clip-text text-transparent">{user.name.split(" ")[0]}</span>
-                  </>
-                ) : (
-                  ""
-                )}
-              </h1>
+    <div className="space-y-8">
+      <section aria-labelledby="hello" className="flex flex-wrap items-center justify-between gap-5">
+        <div className="flex items-center gap-4">
+          {user ? (
+            <span className="rounded-full p-1 shadow-[0_0_22px_2px_rgba(255,196,0,0.45)] ring-2 ring-gold">
+              <Avatar id={user.id} v={user.photo_at} name={user.name} dept={user.department} size={52} />
+            </span>
+          ) : (
+            <span className="skeleton h-[60px] w-[60px] rounded-full" />
+          )}
+          <div>
+            <h1 id="hello" className="text-[26px] font-semibold leading-tight text-ink sm:text-[30px]">
+              {greeting()}
               {user && (
-                <div className="mt-2.5 flex flex-wrap items-center gap-2 text-[13px] text-white/75">
-                  <LevelTag level={user.level} />
-                  <span className="rounded-md bg-white">
-                    <DeptTag dept={user.department} />
-                  </span>
-                  {user.title && <span>{user.title}</span>}
-                  {manager && (
-                    <Link href={`/directory?id=${manager.id}`} className="text-white/75 underline decoration-white/30 hover:text-gold">
-                      Reports to {manager.name}
-                    </Link>
-                  )}
-                </div>
+                <>
+                  ,{" "}
+                  <span className="bg-[linear-gradient(transparent_62%,rgba(255,196,0,0.6)_62%)] px-0.5">{user.name.split(" ")[0]}</span>
+                </>
               )}
-            </div>
+            </h1>
+            {user && (
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-stone-600">
+                <LevelTag level={user.level} />
+                <DeptTag dept={user.department} />
+                {user.title && <span>{user.title}</span>}
+                {manager && (
+                  <Link href={`/directory?id=${manager.id}`} className="text-stone-600 underline decoration-line hover:text-ember">
+                    Reports to {manager.name}
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
-          <Link
-            href="/help"
-            className="btn-magic inline-flex items-center gap-2 rounded-xl bg-gold px-5 py-3 text-[14px] font-semibold text-nil hover:bg-[#FFD86B]"
-          >
-            <IconTicket size={16} /> Raise a ticket
-          </Link>
         </div>
+        <Link
+          href="/help"
+          className="btn-magic inline-flex items-center gap-2 rounded-xl bg-nil px-5 py-3 text-[14px] font-semibold text-white ring-1 ring-gold/60"
+        >
+          <IconTicket size={16} className="text-gold" /> Raise a ticket
+        </Link>
       </section>
 
+      <section aria-labelledby="apps-h">
+        <div className="mb-1 flex items-baseline justify-between">
+          <h2 id="apps-h" className="text-[17px] font-semibold text-ink">Your apps</h2>
+          <Link href="/apps" className="flex items-center gap-1 text-[13px] font-medium text-ember hover:underline">
+            All apps <IconArrowRight size={14} />
+          </Link>
+        </div>
+        <AppRail />
+      </section>
+
+      <FeaturedCarousel />
+
       <div className="grid gap-8 lg:grid-cols-3">
-        <section aria-labelledby="apps-h" className="lg:col-span-2">
+        <section aria-labelledby="upd-h" className="lg:col-span-2">
           <div className="mb-3 flex items-baseline justify-between">
-            <h2 id="apps-h" className="text-[17px] font-semibold text-ink">Your apps</h2>
-            <Link href="/apps" className="flex items-center gap-1 text-[13px] font-medium text-ember hover:underline">
-              All apps <IconArrowRight size={14} />
+            <h2 id="upd-h" className="text-[17px] font-semibold text-ink">Latest updates</h2>
+            <Link href="/updates" className="flex items-center gap-1 text-[13px] font-medium text-ember hover:underline">
+              All updates <IconArrowRight size={14} />
             </Link>
           </div>
-          <AppLauncher limit={8} />
+          <UpdatesFeed limit={5} />
         </section>
 
-        <aside aria-label="Shortcuts" className="space-y-3">
-          <h2 className="text-[17px] font-semibold text-ink">Need something?</h2>
-          <ul className="glow-card glow-flat divide-y divide-line overflow-hidden rounded-xl border border-line bg-panel text-[13.5px]">
+        <aside aria-labelledby="need-h" className="lg:sticky lg:top-24 lg:self-start">
+          {/* Glow frame: the one yellow surface on the page. */}
+          <div className="rounded-2xl bg-gold p-1.5 shadow-[0_10px_30px_-12px_rgba(234,179,8,0.8)]">
+            <h2 id="need-h" className="px-3 pb-2 pt-1.5 text-[17px] font-semibold text-nil">Need something?</h2>
+          <ul className="divide-y divide-line overflow-hidden rounded-xl bg-panel text-[13.5px]">
             <li>
               <Link href="/help" className="flex items-center gap-3 px-4 py-3 hover:bg-ground">
                 <IconTicket size={17} className="text-stone-500" />
@@ -141,18 +145,9 @@ export default function HomeView() {
               </Link>
             </li>
           </ul>
+          </div>
         </aside>
       </div>
-
-      <section aria-labelledby="upd-h">
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 id="upd-h" className="text-[17px] font-semibold text-ink">Latest updates</h2>
-          <Link href="/updates" className="flex items-center gap-1 text-[13px] font-medium text-ember hover:underline">
-            All updates <IconArrowRight size={14} />
-          </Link>
-        </div>
-        <UpdatesFeed limit={5} />
-      </section>
     </div>
   );
 }

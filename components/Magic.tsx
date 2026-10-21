@@ -37,7 +37,8 @@ export default function Magic() {
     );
     const tag = () =>
       document.querySelectorAll<HTMLElement>(REVEAL).forEach((el) => {
-        if (el.dataset.reveal) return;
+        // data-noreveal: parts that animate themselves (e.g. carousel slides).
+        if (el.dataset.reveal || el.closest("[data-noreveal]")) return;
         el.dataset.reveal = "1";
         // Siblings cascade in, capped so long lists don't drag.
         const i = el.parentElement ? Array.prototype.indexOf.call(el.parentElement.children, el) : 0;
