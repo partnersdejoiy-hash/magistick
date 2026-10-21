@@ -44,10 +44,25 @@ export default function SearchView() {
     </section>
   );
 
-  if (!q) return <p className="text-[14px] text-stone-600">Type something in the search box above.</p>;
+  const box = (
+    <form role="search" action="/search" className="mb-6">
+      <input
+        key={q}
+        name="q"
+        defaultValue={q}
+        autoFocus={!q}
+        placeholder="Search apps, people, updates"
+        aria-label="Search apps, people and updates"
+        className="h-11 w-full rounded-xl border border-line bg-panel px-4 text-[14px] text-ink placeholder:text-stone-400 focus:border-gold focus:outline-none"
+      />
+    </form>
+  );
+
+  if (!q) return <div className="mx-auto max-w-4xl">{box}</div>;
 
   return (
     <div className="mx-auto max-w-4xl">
+      {box}
       <h1 className="text-[22px] font-semibold tracking-tight text-ink">Results for “{q}”</h1>
       {block(
         "Apps",
