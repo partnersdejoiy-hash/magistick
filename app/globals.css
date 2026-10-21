@@ -93,6 +93,58 @@ html::-webkit-scrollbar-thumb {
 /* Article body: comfortable measure */
 .prose-body p + p { margin-top: 1.1em; }
 
+/* Org chart (components/TeamChart): connector lines drawn with borders. */
+.org-tree ul {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 26px;
+}
+.org-tree > ul { padding-top: 0; }
+.org-tree li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 26px 8px 0;
+}
+.org-tree li::before,
+.org-tree li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 50%;
+  height: 26px;
+  border-top: 2px solid #d4d4d8;
+}
+.org-tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid #d4d4d8;
+}
+.org-tree li:only-child::before,
+.org-tree li:only-child::after { display: none; }
+.org-tree li:only-child { padding-top: 0; }
+.org-tree li:first-child::before,
+.org-tree li:last-child::after { border: 0 none; }
+.org-tree li:last-child::before {
+  border-right: 2px solid #d4d4d8;
+  border-radius: 0 10px 0 0;
+}
+.org-tree li:first-child::after { border-radius: 10px 0 0 0; }
+.org-tree ul ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 26px;
+  border-left: 2px solid #d4d4d8;
+}
+.org-tree > ul > li { padding-top: 0; }
+.org-tree > ul > li::before,
+.org-tree > ul > li::after { display: none; }
+
 /* ================= magic ================= */
 
 /* Glowstick scroll bar (components/Magic.tsx). */

@@ -14,6 +14,7 @@ const NAV = [
   { href: "/apps", label: "Apps" },
   { href: "/updates", label: "Updates" },
   { href: "/directory", label: "Directory" },
+  { href: "/team", label: "Team" },
   { href: "/policies", label: "Policies" },
   { href: "/help", label: "Get Help" },
   { href: "/new-hire", label: "New Hire" },
@@ -258,7 +259,7 @@ function Search() {
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search apps, people, updates"
         aria-label="Search apps, people and updates"
-        className="on-nil h-9 w-64 rounded-md border border-white/10 bg-nil-2 pl-9 pr-3 text-[13px] text-white placeholder:text-white/55 focus:border-gold/70 focus:outline-none lg:w-72"
+        className="on-nil h-9 w-64 rounded-md border border-white/10 bg-nil-2 pl-9 pr-3 text-[13px] text-white placeholder:text-white/55 focus:border-gold/70 focus:outline-none lg:w-40 xl:w-72"
       />
     </form>
   );
@@ -295,7 +296,7 @@ export default function Header() {
                   key={it.href}
                   href={it.href}
                   aria-current={active(it.href) ? "page" : undefined}
-                  className={`on-nil relative flex items-center px-3 text-[13.5px] font-medium transition-colors ${
+                  className={`on-nil relative flex items-center px-2.5 text-[13.5px] font-medium transition-colors xl:px-3 ${
                     active(it.href) ? "text-white" : "text-white/70 hover:text-white"
                   }`}
                 >

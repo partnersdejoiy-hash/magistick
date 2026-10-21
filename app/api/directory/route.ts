@@ -12,12 +12,14 @@ const card = (p: Person, reports: number) => ({
   level: p.level,
   department: p.department,
   location: p.location,
+  manager_id: p.manager_id,
   reports,
 });
 
 /**
  * GET /api/directory?id=<personId>  → { person, chain (top→down), reports }
  * GET /api/directory?q=<text>       → { results } (name, email, title, location)
+ * GET /api/directory?all=1          → { people } every active person, for the team chart
  * No params → the caller's own card. Suspended people are hidden.
  */
 export async function GET(req: NextRequest) {
@@ -28,6 +30,8 @@ export async function GET(req: NextRequest) {
   const count = new Map<string, number>();
   for (const p of people) if (p.manager_id) count.set(p.manager_id, (count.get(p.manager_id) ?? 0) + 1);
   const toCard = (p: Person) => card(p, count.get(p.id) ?? 0);
+
+  if (req.nextUrl.searchParams.get("all")) return NextResponse.json({ people: people.map(toCard) });
 
   const q = req.nextUrl.searchParams.get("q")?.trim().toLowerCase();
   if (q) {
