@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireMe } from "@/lib/auth";
 import { createTicket, HelpdeskError, listMyTickets } from "@/lib/helpdeskServer";
 import { orbitdeskConfigured } from "@/lib/orbitdesk";
+import { PREVIEW_TICKETS, UI_PREVIEW } from "@/lib/preview";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ const fail = (e: unknown) =>
 export async function GET() {
   const g = await requireMe(["raise_tickets"]);
   if ("error" in g) return g.error;
+  if (UI_PREVIEW) return NextResponse.json({ connected: true, tickets: PREVIEW_TICKETS });
   try {
     return NextResponse.json({ connected: orbitdeskConfigured(), tickets: await listMyTickets(g.me) });
   } catch (e) {

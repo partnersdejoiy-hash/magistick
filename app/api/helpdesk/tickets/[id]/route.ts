@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireMe } from "@/lib/auth";
 import { getMyTicket, HelpdeskError } from "@/lib/helpdeskServer";
+import { PREVIEW_TICKETS, UI_PREVIEW } from "@/lib/preview";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,10 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   if ("error" in g) return g.error;
   const id = Number(params.id);
   if (!Number.isSafeInteger(id) || id < 1) return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
+  if (UI_PREVIEW) {
+    const t = PREVIEW_TICKETS.find((x) => x.id === id);
+    return t ? NextResponse.json({ ticket: t }) : NextResponse.json({ error: "Ticket not found." }, { status: 404 });
+  }
   try {
     return NextResponse.json({ ticket: await getMyTicket(g.me, id) });
   } catch (e) {
