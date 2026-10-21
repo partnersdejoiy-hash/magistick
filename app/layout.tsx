@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Fraunces, Outfit } from "next/font/google";
 import Header from "@/components/Header";
 import HelpFab from "@/components/HelpFab";
@@ -36,7 +37,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p>
                 <span className="font-semibold text-ink">magistick</span> · DEJOIY India Pvt. Ltd. · Internal use only
               </p>
-              <p>Trouble? Raise it under Get Help.</p>
+              <p className="flex flex-wrap gap-x-4 gap-y-1">
+                <Link href="/vision" className="hover:text-ember">
+                  Founders&apos; vision
+                </Link>
+                <Link href="/policies" className="hover:text-ember">
+                  Policy Center
+                </Link>
+                <span>Trouble? Raise it under Get Help.</span>
+              </p>
             </div>
           </footer>
         </Providers>
