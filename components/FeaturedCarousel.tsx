@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { formatDate } from "@/lib/format";
+import { useSession } from "@/lib/roles";
 import GeoToggle, { matchesGeo, type GeoView } from "./GeoToggle";
 import { themeFor } from "./HeroArt";
 import type { Post } from "./UpdatesFeed";
@@ -28,7 +29,9 @@ export default function FeaturedCarousel({ view, onView }: { view: GeoView; onVi
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) setPaused(true);
   }, []);
 
-  const posts = useMemo(() => (all ? all.filter((p) => matchesGeo(view, p.region)).slice(0, SLIDES) : null), [all, view]);
+  const { user } = useSession();
+  const place = user?.location;
+  const posts = useMemo(() => (all ? all.filter((p) => matchesGeo(view, p.region, place)).slice(0, SLIDES) : null), [all, view, place]);
   useEffect(() => setI(0), [view]);
 
   const n = posts?.length ?? 0;

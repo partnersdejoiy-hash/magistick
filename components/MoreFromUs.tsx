@@ -16,7 +16,7 @@ const PEOPLE_NEWS = /hr|people|culture|kudos|shine|benefit|policy|workforce|well
 
 /** Sticky "More from us" column: HR & culture banners, the founder, the Policy Center, and quick help links. */
 export default function MoreFromUs({ geo }: { geo: GeoView }) {
-  const { can } = useSession();
+  const { can, user } = useSession();
   const [posts, setPosts] = useState<Post[] | null>(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function MoreFromUs({ geo }: { geo: GeoView }) {
       .catch(() => setPosts([]));
   }, []);
 
-  const news = (posts ?? []).filter((p) => PEOPLE_NEWS.test(p.category) && matchesGeo(geo, p.region)).slice(0, 3);
+  const news = (posts ?? []).filter((p) => PEOPLE_NEWS.test(p.category) && matchesGeo(geo, p.region, user?.location)).slice(0, 3);
 
   return (
     <aside aria-labelledby="more-h" className="lg:sticky lg:top-24 lg:self-start">

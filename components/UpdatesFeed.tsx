@@ -66,7 +66,7 @@ export default function UpdatesFeed({
     (p) =>
       (scope === "all" || (scope === "dept" ? p.audience !== "all" : p.audience === "all")) &&
       (category === "All" || p.category === category) &&
-      matchesGeo(view, p.region),
+      matchesGeo(view, p.region, user?.location),
   );
   const shown = filtered.slice(0, visible);
   const deptLabel = user ? DEPT_BY_ID[user.department].label : "My department";

@@ -6,8 +6,13 @@ import { useSession } from "@/lib/roles";
 /** Which updates to show by geography: everything you can see, company-wide only, or your location only. */
 export type GeoView = "all" | "global" | "local";
 
-export const matchesGeo = (view: GeoView, region: string | undefined) =>
-  view === "all" || (view === "global" ? (region ?? "global") === "global" : (region ?? "global") !== "global");
+/** "local" means the reader's own location (case-insensitive), never another office's. */
+export const matchesGeo = (view: GeoView, region: string | undefined, place?: string) => {
+  const r = (region ?? "global").trim().toLowerCase();
+  if (view === "all") return r === "global" || !place || r === place.trim().toLowerCase();
+  if (view === "global") return r === "global";
+  return !!place && r === place.trim().toLowerCase();
+};
 
 const KEY = "magistick.geo";
 
