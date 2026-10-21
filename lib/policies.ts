@@ -1,8 +1,8 @@
 /**
  * DEJOIY Policy Center content. Original drafts written for DEJOIY (India,
  * BPO/ITES) on Indian law as of Oct 2026 — Labour Codes in force from
- * 21 Nov 2025, POSH Act 2013, Maternity Benefit Act (as amended 2017),
- * DPDP Act 2023. Every policy is marked DRAFT until HR and legal sign off:
+ * 21 Nov 2025 (incl. the Code on Social Security for maternity), POSH Act
+ * 2013, DPDP Act 2023 and DPDP Rules 2025. Every policy is marked DRAFT until HR and legal sign off:
  * company-specific numbers (leave days, gift limits, timelines) are
  * proposals for HR to confirm.
  *
@@ -188,7 +188,7 @@ export const POLICIES: Policy[] = [
         items: [
           { value: "18", label: "Earned leave days (1.5 accrue each month)" },
           { value: "6 + 6", label: "Casual + sick leave days" },
-          { value: "26 wks", label: "Maternity leave (Maternity Benefit Act)" },
+          { value: "26 wks", label: "Maternity leave (Code on Social Security)" },
           { value: "5 days", label: "Paternity leave" },
         ],
         photo: "celebration",
