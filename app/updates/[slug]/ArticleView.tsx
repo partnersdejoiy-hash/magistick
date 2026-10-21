@@ -11,6 +11,15 @@ export default function ArticleView({ article, prev, next }: { article: DbPost; 
       <Link href="/updates" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stone-600 hover:text-ember">
         <IconArrowLeft size={14} /> All updates
       </Link>
+      {article.imageUrl && (
+        <div className="relative mt-6 aspect-[16/8] overflow-hidden rounded-3xl bg-parchment shadow-lift">
+          {/* eslint-disable-next-line @next/next/no-img-element -- banner photo */}
+          <img src={article.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <span className="absolute left-3 top-3 rounded-full bg-black/45 px-3 py-1 text-[12px] font-semibold text-white backdrop-blur-sm">
+            {(article.region ?? "global") === "global" ? "🌐 Global" : `📍 ${article.region}`}
+          </span>
+        </div>
+      )}
       <div className="mt-6 flex flex-wrap items-center gap-2 text-[13px] text-stone-600">
         <span className="font-medium text-stone-700">{article.category}</span>
         {isDept(article.audience) && <DeptTag dept={article.audience} />}

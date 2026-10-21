@@ -6,6 +6,7 @@ import { useSession } from "@/lib/roles";
 import { DEPT_BY_ID, isDept } from "@/lib/rbac";
 import { DeptTag } from "./Stamp";
 import { formatDate } from "@/lib/format";
+import GeoToggle, { matchesGeo, useGeoView, type GeoView } from "./GeoToggle";
 
 export type Post = {
   id: string;
@@ -16,6 +17,8 @@ export type Post = {
   author: string;
   date: string;
   audience: string;
+  region?: string; // 'global' or a location
+  imageUrl?: string; // banner photo
 };
 
 
@@ -26,8 +29,19 @@ type Scope = "all" | "dept" | "company";
  * department; the scope tabs let them narrow to either (Glowstick's geo toggle,
  * done for departments).
  */
-export default function UpdatesFeed({ limit, showFilters = true }: { limit?: number; showFilters?: boolean }) {
+export default function UpdatesFeed({
+  limit,
+  showFilters = true,
+  geo,
+}: {
+  limit?: number;
+  showFilters?: boolean;
+  /** Geography chosen by the parent (Home); when absent the feed shows its own toggle. */
+  geo?: GeoView;
+}) {
   const { user } = useSession();
+  const [ownGeo, setOwnGeo] = useGeoView();
+  const view = geo ?? ownGeo;
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [error, setError] = useState("");
   const [scope, setScope] = useState<Scope>("all");
@@ -51,7 +65,8 @@ export default function UpdatesFeed({ limit, showFilters = true }: { limit?: num
   const filtered = (posts ?? []).filter(
     (p) =>
       (scope === "all" || (scope === "dept" ? p.audience !== "all" : p.audience === "all")) &&
-      (category === "All" || p.category === category),
+      (category === "All" || p.category === category) &&
+      matchesGeo(view, p.region),
   );
   const shown = filtered.slice(0, visible);
   const deptLabel = user ? DEPT_BY_ID[user.department].label : "My department";
@@ -84,6 +99,7 @@ export default function UpdatesFeed({ limit, showFilters = true }: { limit?: num
               </button>
             ))}
           </div>
+          {!geo && <GeoToggle value={ownGeo} onChange={setOwnGeo} />}
           <label className="flex items-center gap-2 text-[13px] text-stone-600">
             Category
             <select
@@ -117,29 +133,53 @@ export default function UpdatesFeed({ limit, showFilters = true }: { limit?: num
           </p>
         </div>
       ) : (
-        <ul className="glow-card glow-flat divide-y divide-line overflow-hidden rounded-xl border border-line bg-panel">
-          {shown.map((p, i) => (
-            <li key={p.id}>
-              <Link href={`/updates/${p.slug}`} className="group block px-5 py-4 transition-colors hover:bg-ground/70">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-stone-500">
-                  <span className="font-medium text-stone-700">{p.category}</span>
-                  <span aria-hidden>·</span>
-                  <time dateTime={p.date} className="tabular">{formatDate(p.date)}</time>
-                  {isDept(p.audience) && <DeptTag dept={p.audience} className="ml-auto" />}
-                </div>
-                <p
-                  className={`mt-1.5 font-semibold text-ink group-hover:text-ember ${
-                    i === 0 && !limit ? "text-[19px] leading-snug" : "text-[15.5px] leading-snug"
-                  }`}
+        <ul className="space-y-4">
+          {shown.map((p, i) => {
+            const big = i === 0;
+            return (
+              <li key={p.id}>
+                <Link
+                  href={`/updates/${p.slug}`}
+                  className={`glow-card group grid overflow-hidden rounded-3xl border border-line bg-panel ${big ? "" : "sm:grid-cols-[220px_1fr]"}`}
                 >
-                  {p.title}
-                </p>
-                {(i === 0 || !limit) && (
-                  <p className="mt-1 line-clamp-2 max-w-[70ch] text-[13.5px] leading-relaxed text-stone-600">{p.excerpt}</p>
-                )}
-              </Link>
-            </li>
-          ))}
+                  <div className={`relative overflow-hidden bg-parchment ${big ? "aspect-[16/7]" : "aspect-[16/9] sm:aspect-auto sm:min-h-[150px]"}`}>
+                    {p.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element -- banner photo (CDN or auth-gated upload)
+                      <img
+                        src={p.imageUrl}
+                        alt=""
+                        loading={big ? "eager" : "lazy"}
+                        decoding="async"
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    )}
+                    <span className="absolute left-3 top-3 rounded-full bg-black/45 px-2.5 py-0.5 text-[11.5px] font-semibold text-white backdrop-blur-sm">
+                      {(p.region ?? "global") === "global" ? "🌐 Global" : `📍 ${p.region}`}
+                    </span>
+                  </div>
+                  <div className={big ? "p-5 sm:p-7" : "p-5"}>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-stone-500">
+                      <span className="font-semibold text-ember">{p.category}</span>
+                      <span aria-hidden>·</span>
+                      <time dateTime={p.date} className="tabular">
+                        {formatDate(p.date)}
+                      </time>
+                      {isDept(p.audience) && <DeptTag dept={p.audience} className="ml-auto" />}
+                    </div>
+                    <p className={`mt-1.5 font-semibold leading-snug text-ink group-hover:text-ember ${big ? "font-display text-[24px] sm:text-[28px]" : "text-[17px]"}`}>
+                      {p.title}
+                    </p>
+                    <p className={`mt-1.5 max-w-[70ch] leading-relaxed text-stone-600 ${big ? "line-clamp-3 text-[15px]" : "line-clamp-2 text-[13.5px]"}`}>{p.excerpt}</p>
+                    {big && (
+                      <span className="mt-4 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-ember">
+                        Read the update <span aria-hidden>→</span>
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
 

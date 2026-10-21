@@ -11,8 +11,10 @@ export async function GET(_req: Request, ctx: { params: { slug: string } }) {
   const dept = g.me.department;
   const db = sql();
   const all = (await db`
-    SELECT id, slug, title, excerpt, category, author, date, body, audience
-    FROM posts WHERE audience = 'all' OR audience = ${dept}
+    SELECT id, slug, title, excerpt, category, author, date, body, audience, region,
+      CASE WHEN image LIKE 'data:%' THEN 'data' ELSE image END AS image
+    FROM posts WHERE (audience = 'all' OR audience = ${dept})
+      AND (region = 'global' OR lower(region) = lower(${g.me.location}))
     ORDER BY date DESC, created_at DESC
   `) as Record<string, unknown>[];
   const idx = all.findIndex((r) => r.slug === ctx.params.slug);

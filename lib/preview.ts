@@ -1,3 +1,4 @@
+import { ARTICLES } from "./data";
 /**
  * Temporary UI preview: sign-in off, read-only. Vercel preview deployments only;
  * VERCEL_ENV is "production" on the live site, so this can never turn on there.
@@ -83,3 +84,14 @@ export const PREVIEW_TICKETS = [
     ],
   },
 ];
+
+/** Sample posts as DB-shaped rows (with geography) for the preview; pass through rowToPost. */
+const SAMPLE_REGIONS = ["global", "Delhi", "global", "Noida", "global", "Delhi", "global", "global"];
+export const PREVIEW_POST_ROWS: Record<string, unknown>[] = ARTICLES.map((a, i) => ({
+  ...a,
+  id: a.slug,
+  audience: "all",
+  region: SAMPLE_REGIONS[i % SAMPLE_REGIONS.length],
+  image: "",
+  body: JSON.stringify(a.body),
+})).sort((x, y) => String(y.date).localeCompare(String(x.date)));

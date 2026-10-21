@@ -124,7 +124,7 @@ export async function getMe(): Promise<Me | null> {
       department: "leadership",
       title: "",
       manager_id: null,
-      location: "",
+      location: "Delhi",
       photo_at: 0,
       perms: [...PERM_IDS],
     };

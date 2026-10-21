@@ -2,6 +2,7 @@ import { neon } from "@neondatabase/serverless";
 import { randomUUID } from "crypto";
 import { ARTICLES } from "./data";
 import { LEVEL_IDS } from "./rbac";
+import { postImageUrl } from "./postImages";
 
 /**
  * Postgres (Neon) access for magistick phase 2.
@@ -79,6 +80,9 @@ const SCHEMA_STATEMENTS = [
      PRIMARY KEY (app_id, department)
    )`,
   `ALTER TABLE posts ADD COLUMN IF NOT EXISTS audience TEXT NOT NULL DEFAULT 'all'`,
+  // Update banners: photo ('' = category default, 'lib:<key>', or an uploaded data URL) and geography.
+  `ALTER TABLE posts ADD COLUMN IF NOT EXISTS image TEXT NOT NULL DEFAULT ''`,
+  `ALTER TABLE posts ADD COLUMN IF NOT EXISTS region TEXT NOT NULL DEFAULT 'global'`,
   `CREATE TABLE IF NOT EXISTS audit_log (
      id TEXT PRIMARY KEY,
      actor_id TEXT,
@@ -215,6 +219,9 @@ export type DbPost = {
   date: string;
   body: string[];
   audience: string; // 'all' or a department id
+  region: string; // 'global' or a location name
+  imageUrl: string; // banner to show
+  image: string; // '', 'lib:<key>' or 'data' (an upload)
 };
 
 /** Input shape for creating/updating a bulletin post. */
@@ -226,6 +233,8 @@ export type PostInput = {
   date: string; // YYYY-MM-DD
   body: string[];
   audience: string; // 'all' or a department id
+  region?: string; // 'global' (default) or a location name
+  image?: string; // '', 'lib:<key>' or a data-URL JPEG
 };
 
 export function rowToPost(row: Record<string, unknown>): DbPost {
@@ -246,6 +255,9 @@ export function rowToPost(row: Record<string, unknown>): DbPost {
     date: String(row.date ?? ""),
     body,
     audience: String(row.audience ?? "all"),
+    region: String(row.region ?? "global"),
+    image: String(row.image ?? ""),
+    imageUrl: postImageUrl(String(row.id), String(row.image ?? ""), String(row.category ?? "")),
   };
 }
 
