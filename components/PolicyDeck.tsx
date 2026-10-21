@@ -244,7 +244,7 @@ function SlideView({ p, s }: { p: Policy; s: Slide }) {
 
 /* ---------------- the deck ---------------- */
 
-export default function PolicyDeck({ policy, prev, next }: { policy: Policy; prev?: Policy; next?: Policy }) {
+export default function PolicyDeck({ policy, prev, next, children }: { policy: Policy; prev?: Policy; next?: Policy; children?: ReactNode }) {
   const total = policy.slides.length;
   const [i, setI] = useState(0);
   const [dir, setDir] = useState(1);
@@ -289,7 +289,7 @@ export default function PolicyDeck({ policy, prev, next }: { policy: Policy; pre
   const progress: CSSProperties = { width: `${((i + 1) / total) * 100}%`, backgroundColor: policy.accent };
 
   return (
-    <article aria-labelledby="policy-title" className="space-y-5">
+    <article aria-labelledby="policy-title" className="space-y-6">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center justify-between gap-3 text-[13px]">
         <Link href="/policies" className="font-medium text-ember hover:underline">
           ← Policy Center
@@ -391,6 +391,8 @@ export default function PolicyDeck({ policy, prev, next }: { policy: Policy; pre
         Tip: use ← → keys or swipe. This policy is a <strong className="font-semibold text-stone-700">{policy.status.toLowerCase()}</strong> pending
         HR and legal review; company-specific numbers may change before it is published.
       </p>
+
+      {children}
 
       {(prev || next) && (
         <div className="grid gap-3 sm:grid-cols-2">
