@@ -359,7 +359,7 @@ function PersonRow({
       <tr className={open ? "bg-ember-tint/40" : "hover:bg-ground/60"}>
         <td className="px-4 py-2.5">
           <div className="flex items-center gap-3">
-            <Avatar name={p.name} dept={p.department} size={32} />
+            <Avatar id={p.id} name={p.name} dept={p.department} size={32} />
             <div className="min-w-0">
               <p className="truncate font-medium text-ink">
                 {p.name} {me && <span className="text-[12px] font-normal text-stone-500">(you)</span>}

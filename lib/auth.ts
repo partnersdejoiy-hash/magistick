@@ -99,6 +99,8 @@ export type Me = {
   title: string;
   manager_id: string | null;
   location: string;
+  /** Epoch ms of the current profile photo; 0 = none. */
+  photo_at: number;
   perms: PermId[];
 };
 
@@ -116,7 +118,7 @@ export async function getMe(): Promise<Me | null> {
   if (!s) return null;
   await ensureSchema();
   const rows = (await sql()`
-    SELECT id, email, name, role, department, title, manager_id, location, status
+    SELECT id, email, name, role, department, title, manager_id, location, status, photo_at
     FROM users WHERE id = ${s.id} LIMIT 1`) as Record<string, string | null>[];
   const r = rows[0];
   if (!r || r.status !== "active" || !isLevel(r.role)) return null;
@@ -130,6 +132,7 @@ export async function getMe(): Promise<Me | null> {
     title: String(r.title ?? ""),
     manager_id: r.manager_id,
     location: String(r.location ?? ""),
+    photo_at: Number(r.photo_at ?? 0),
     perms: (await loadMatrix())[level],
   };
 }

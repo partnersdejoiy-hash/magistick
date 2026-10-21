@@ -13,6 +13,7 @@ export type MeUser = {
   title: string;
   manager_id: string | null;
   location: string;
+  photo_at: number;
   perms: PermId[];
 };
 

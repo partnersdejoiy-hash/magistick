@@ -28,7 +28,7 @@ function PersonCard({ p, focus = false }: { p: Card; focus?: boolean }) {
       }`}
     >
       <div className="flex items-start gap-3">
-        <Avatar name={p.name} dept={p.department} size={focus ? 52 : 40} />
+        <Avatar id={p.id} name={p.name} dept={p.department} size={focus ? 52 : 40} />
         <div className="min-w-0">
           <p className={`truncate font-semibold text-ink ${focus ? "text-[17px]" : "text-[14.5px]"}`}>{p.name}</p>
           <p className="truncate text-[13px] text-stone-600">{p.title || LEVEL_BY_ID[p.level].label.split(" (")[0]}</p>
@@ -133,7 +133,7 @@ export default function DirectoryView() {
                 results.map((p) => (
                   <li key={p.id}>
                     <button type="button" onClick={() => go(p.id)} className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-ground">
-                      <Avatar name={p.name} dept={p.department} size={30} />
+                      <Avatar id={p.id} name={p.name} dept={p.department} size={30} />
                       <span className="min-w-0">
                         <span className="block truncate text-[13.5px] font-medium text-ink">{p.name}</span>
                         <span className="block truncate text-[12px] text-stone-500">{p.title || LEVEL_BY_ID[p.level].label}</span>

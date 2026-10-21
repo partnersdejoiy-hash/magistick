@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { DEPT_BY_ID, LEVEL_BY_ID, type DeptId, type LevelId } from "@/lib/rbac";
+import AvatarPhoto from "./AvatarPhoto";
 
 /**
  * The signature move: every department owns one hand-block "thappa" motif in
@@ -98,8 +99,12 @@ export function initials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-/** Avatar: initials on the department's dye, with that department's stamp pressed in the corner. */
-export function Avatar({ name, dept, size = 40 }: { name: string; dept: DeptId; size?: number }) {
+/**
+ * Avatar: initials on the department's dye, with that department's stamp pressed in the corner.
+ * With `id`, the person's photo covers the initials when they have one. `v` is their photo_at
+ * when known: 0 skips the request, a timestamp busts the cache right after a change.
+ */
+export function Avatar({ name, dept, size = 40, id, v }: { name: string; dept: DeptId; size?: number; id?: string; v?: number }) {
   const d = DEPT_BY_ID[dept];
   return (
     <span
@@ -108,8 +113,9 @@ export function Avatar({ name, dept, size = 40 }: { name: string; dept: DeptId; 
       aria-hidden
     >
       {initials(name)}
+      {id && v !== 0 && <AvatarPhoto key={`${id}-${v ?? ""}`} src={`/api/people/${encodeURIComponent(id)}/photo${v ? `?v=${v}` : ""}`} />}
       <span
-        className="absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-white"
+        className="absolute -bottom-0.5 -right-0.5 z-[1] flex items-center justify-center rounded-full bg-white"
         style={{ width: size * 0.42, height: size * 0.42, boxShadow: "0 0 0 1.5px #fff" }}
       >
         <Stamp dept={dept} size={Math.round(size * 0.28)} />
