@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireMe } from "@/lib/auth";
 import { chainFrom, loadPeople, type Person } from "@/lib/people";
+import { PREVIEW_TEAM, UI_PREVIEW } from "@/lib/preview";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,10 @@ const card = (p: Person, reports: number) => ({
 export async function GET(req: NextRequest) {
   const g = await requireMe(["view_directory"]);
   if ("error" in g) return g.error;
+  if (UI_PREVIEW && req.nextUrl.searchParams.get("all")) {
+    const reports = (id: string | null) => PREVIEW_TEAM.filter((p) => p.manager_id === id).length;
+    return NextResponse.json({ people: PREVIEW_TEAM.map((p) => ({ ...p, email: "", reports: reports(p.id) })) });
+  }
   const people = (await loadPeople()).filter((p) => p.status === "active");
   const byId = new Map(people.map((p) => [p.id, p]));
   const count = new Map<string, number>();

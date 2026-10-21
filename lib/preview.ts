@@ -18,3 +18,20 @@ export const PREVIEW_APPS = [
   ["referrals", "Referrals", "Refer a friend (sample)", "HR", "userplus", "#0D9488"],
   ["townhall", "Town Hall", "Live sessions (sample)", "Comms", "video", "#E11D48"],
 ].map(([id, name, blurb, category, icon, color], i) => ({ id, name, blurb, category, href: "#", icon, color, sort_order: i + 1 }));
+
+/**
+ * Sample org for the preview's team chart: DEJOIY's people as listed on
+ * dejoiy-site (names, titles, photos). Reporting lines are a sample, not
+ * HR data. Preview only.
+ */
+export const PREVIEW_TEAM = [
+  ["emp1", "Jyoti Sharma", "Founder, Director", "super_admin", "leadership", null],
+  ["emp2", "Anil Sharma", "Managing Director, Co-founder", "admin", "leadership", "emp1"],
+  ["emp5", "Dharmendra Sharma", "Strategic Advisor", "dept_head", "leadership", "emp1"],
+  ["emp3", "Deepak Sharma", "Chief Technology & Operations Lead", "dept_head", "it", "emp2"],
+  ["emp7", "Syed Adnan Alir", "Business Manager", "sr_manager", "sales", "emp2"],
+  ["emp4", "Komal Sharma", "Brand & Communications Coordinator", "specialist", "hr", "emp2"],
+  ["emp6", "Deepanshu Chander Yaduvanshi", "Web Developer & Digital Infrastructure Engineer", "specialist", "it", "emp3"],
+  ["emp8", "Khushi Sharma", "Operations Support", "sr_associate", "operations", "emp3"],
+  ["emp9", "Harjoi Bajaj", "Brand Ambassador", "associate", "sales", "emp4"],
+].map(([id, name, title, level, department, manager_id]) => ({ id, name, title, level, department, manager_id, location: "Delhi" }));
