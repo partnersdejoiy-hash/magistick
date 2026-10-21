@@ -47,7 +47,7 @@ export default function HomeView() {
           <div className="flex items-center gap-4">
             {user ? (
               <span className="rounded-full p-1 shadow-[0_0_24px_2px_rgba(255,196,0,0.35)] ring-1 ring-gold/50">
-                <Avatar name={user.name} dept={user.department} size={56} />
+                <Avatar id={user.id} v={user.photo_at} name={user.name} dept={user.department} size={56} />
               </span>
             ) : (
               <span className="h-[64px] w-[64px] animate-pulse rounded-full bg-white/10" />

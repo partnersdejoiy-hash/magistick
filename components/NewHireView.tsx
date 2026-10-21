@@ -111,7 +111,7 @@ export default function NewHireView() {
               {chain.slice(0, 3).map((m, i) => (
                 <li key={m.id}>
                   <Link href={`/directory?id=${m.id}`} className="flex items-center gap-3 rounded-xl border border-line bg-panel px-3 py-2.5 hover:border-ember/40">
-                    <Avatar name={m.name} dept={m.department} size={34} />
+                    <Avatar id={m.id} name={m.name} dept={m.department} size={34} />
                     <span className="min-w-0">
                       <span className="block truncate text-[13.5px] font-semibold text-ink">{m.name}</span>
                       <span className="block truncate text-[12.5px] text-stone-600">

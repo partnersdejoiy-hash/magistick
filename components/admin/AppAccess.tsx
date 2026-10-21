@@ -121,7 +121,7 @@ export default function AppAccess() {
                           style={
                             on
                               ? { backgroundColor: d.dye, borderColor: d.dye, color: "#fff" }
-                              : { borderColor: "#DDE0EB", color: "#454A69", backgroundColor: "#fff" }
+                              : { borderColor: "#E1E2E4", color: "#46464F", backgroundColor: "#fff" }
                           }
                         >
                           <Stamp dept={d.id} size={11} color={on ? "#fff" : undefined} />

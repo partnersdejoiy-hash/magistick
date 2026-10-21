@@ -44,7 +44,7 @@ export default function AdminConsole() {
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <div className="rounded-xl bg-nil p-3 text-white">
           <div className="flex items-center gap-2 px-2 pb-3 pt-1">
-            <Stamp dept={user.department} size={14} color="#E0A526" />
+            <Stamp dept={user.department} size={14} color="#FFC400" />
             <div className="min-w-0">
               <p className="truncate text-[13.5px] font-semibold">Admin</p>
               <p className="truncate text-[12px] text-white/65">

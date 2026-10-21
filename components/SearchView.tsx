@@ -73,7 +73,7 @@ export default function SearchView() {
           {people?.map((p) => (
             <li key={p.id}>
               <Link href={`/directory?id=${p.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-ground">
-                <Avatar name={p.name} dept={p.department} size={34} />
+                <Avatar id={p.id} name={p.name} dept={p.department} size={34} />
                 <span className="text-[14px] font-medium text-ink">{p.name}</span>
                 <span className="truncate text-[13px] text-stone-500">{p.title}</span>
               </Link>

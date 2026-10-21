@@ -112,11 +112,62 @@ function QuickLinks() {
   );
 }
 
+/** Center-crop to a square and shrink to a ~20 KB 256px JPEG before upload. */
+async function toAvatarJpeg(file: File): Promise<string> {
+  const bmp = await createImageBitmap(file);
+  const side = Math.min(bmp.width, bmp.height);
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 256;
+  canvas.getContext("2d")!.drawImage(bmp, (bmp.width - side) / 2, (bmp.height - side) / 2, side, side, 0, 0, 256, 256);
+  bmp.close();
+  return canvas.toDataURL("image/jpeg", 0.85);
+}
+
 function UserMenu() {
-  const { user, signOut } = useSession();
+  const { user, signOut, refresh } = useSession();
   const [open, setOpen] = useState(false);
+  const [photoMsg, setPhotoMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const ref = useDismiss(open, () => setOpen(false));
   if (!user) return null;
+
+  const savePhoto = async (file?: File | null) => {
+    setPhotoMsg("");
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return setPhotoMsg("Choose an image file.");
+    setBusy(true);
+    try {
+      const res = await fetch("/api/me/photo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: await toAvatarJpeg(file) }),
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Couldn't save the photo.");
+      await refresh();
+      setPhotoMsg("Photo updated.");
+    } catch (e) {
+      setPhotoMsg(e instanceof Error ? e.message : "Couldn't save the photo.");
+    } finally {
+      setBusy(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const removePhoto = async () => {
+    setBusy(true);
+    setPhotoMsg("");
+    try {
+      const res = await fetch("/api/me/photo", { method: "DELETE" });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Couldn't remove the photo.");
+      await refresh();
+      setPhotoMsg("Photo removed.");
+    } catch (e) {
+      setPhotoMsg(e instanceof Error ? e.message : "Couldn't remove the photo.");
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <div ref={ref} className="relative">
       <button
@@ -127,7 +178,7 @@ function UserMenu() {
         aria-label={`${user.name}, account menu`}
         className="on-nil flex items-center rounded-full p-0.5 transition-shadow hover:shadow-[0_0_0_2px_rgba(255,255,255,0.25)]"
       >
-        <Avatar name={user.name} dept={user.department} size={32} />
+        <Avatar id={user.id} v={user.photo_at} name={user.name} dept={user.department} size={32} />
       </button>
       {open && (
         <div role="menu" className="absolute right-0 top-11 z-50 w-72 overflow-hidden rounded-xl border border-line bg-panel shadow-lift">
@@ -139,6 +190,38 @@ function UserMenu() {
               {LEVEL_BY_ID[user.level].label.split(" (")[0]} · {DEPT_BY_ID[user.department].label}
             </p>
           </div>
+          <div className="flex items-center gap-3 border-b border-line px-4 py-3">
+            <Avatar id={user.id} v={user.photo_at} name={user.name} dept={user.department} size={40} />
+            <div className="flex flex-wrap gap-x-3 gap-y-1 text-[13px] font-medium">
+              <button
+                type="button"
+                role="menuitem"
+                disabled={busy}
+                onClick={() => fileRef.current?.click()}
+                className="text-ember hover:underline disabled:opacity-50"
+              >
+                {busy ? "Saving…" : user.photo_at ? "Change photo" : "Add a photo"}
+              </button>
+              {user.photo_at > 0 && (
+                <button type="button" role="menuitem" disabled={busy} onClick={removePhoto} className="text-stone-500 hover:text-bad disabled:opacity-50">
+                  Remove
+                </button>
+              )}
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              aria-label="Choose a profile photo"
+              onChange={(e) => savePhoto(e.target.files?.[0])}
+            />
+          </div>
+          {photoMsg && (
+            <p role="status" className="border-b border-line px-4 py-2 text-[12.5px] text-stone-600">
+              {photoMsg}
+            </p>
+          )}
           <Link role="menuitem" href="/directory" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-[13.5px] text-ink hover:bg-ground">
             My place in the org
           </Link>
@@ -198,7 +281,7 @@ export default function Header() {
           <Link href="/" className="on-nil flex shrink-0 items-center gap-2 rounded-md" aria-label="magistick home">
             <span className="logo-glint flex h-7 w-7 items-center justify-center rounded-md bg-gold">
               <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-                <path d="M8 0l1.9 6.1L16 8l-6.1 1.9L8 16l-1.9-6.1L0 8l6.1-1.9z" fill="#1B2250" />
+                <path d="M8 0l1.9 6.1L16 8l-6.1 1.9L8 16l-1.9-6.1L0 8l6.1-1.9z" fill="#262626" />
               </svg>
             </span>
             <span className="font-display text-[19px] font-semibold tracking-tight">magistick</span>
@@ -220,7 +303,7 @@ export default function Header() {
                     <motion.span
                       layoutId="nav-glow"
                       transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                      className="absolute inset-x-3 bottom-0 h-[3px] rounded-t bg-gold shadow-[0_0_12px_2px_rgba(255,196,0,0.6)]"
+                      className="absolute inset-x-3 bottom-0 h-[3px] rounded-t bg-magenta shadow-[0_0_12px_2px_rgba(233,30,99,0.6)]"
                     />
                   )}
                 </Link>
