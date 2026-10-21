@@ -10,8 +10,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const me = await getMe();
   if (!me) redirect(`/login?next=/updates/${params.slug}`);
   const all = (await sql()`
-    SELECT id, slug, title, excerpt, category, author, date, body, audience
-    FROM posts WHERE audience = 'all' OR audience = ${me.department}
+    SELECT id, slug, title, excerpt, category, author, date, body, audience, region,
+      CASE WHEN image LIKE 'data:%' THEN 'data' ELSE image END AS image
+    FROM posts WHERE (audience = 'all' OR audience = ${me.department})
+      AND (region = 'global' OR lower(region) = lower(${me.location}))
     ORDER BY date DESC, created_at DESC
   `) as Record<string, unknown>[];
   const idx = all.findIndex((r) => r.slug === params.slug);

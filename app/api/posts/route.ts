@@ -9,8 +9,10 @@ export async function GET() {
   const g = await requireMe();
   if ("error" in g) return g.error;
   const rows = (await sql()`
-    SELECT id, slug, title, excerpt, category, author, date, body, audience
-    FROM posts WHERE audience = 'all' OR audience = ${g.me.department}
+    SELECT id, slug, title, excerpt, category, author, date, body, audience, region,
+      CASE WHEN image LIKE 'data:%' THEN 'data' ELSE image END AS image
+    FROM posts WHERE (audience = 'all' OR audience = ${g.me.department})
+      AND (region = 'global' OR lower(region) = lower(${g.me.location}))
     ORDER BY date DESC, created_at DESC
   `) as Record<string, unknown>[];
   return NextResponse.json({ posts: rows.map(rowToPost) });

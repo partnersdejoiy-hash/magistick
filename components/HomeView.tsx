@@ -7,11 +7,11 @@ import type { DeptId, LevelId } from "@/lib/rbac";
 import AppRail from "./AppRail";
 import FeaturedCarousel from "./FeaturedCarousel";
 import PolicyHighlights from "./PolicyHighlights";
-import FounderQuote from "./FounderQuote";
+import MoreFromUs from "./MoreFromUs";
+import { useGeoView } from "./GeoToggle";
 import UpdatesFeed from "./UpdatesFeed";
 import { Avatar, DeptTag, LevelTag } from "./Stamp";
-import { IconArrowRight, IconExternal, IconTicket, IconPeople, IconBook } from "./icons";
-import { IT_HELPDESK_URL } from "@/lib/data";
+import { IconArrowRight, IconTicket } from "./icons";
 
 type Card = { id: string; name: string; title: string; level: LevelId; department: DeptId; reports: number };
 
@@ -21,9 +21,9 @@ function greeting() {
 }
 
 export default function HomeView() {
-  const { user, can } = useSession();
+  const { user } = useSession();
   const [manager, setManager] = useState<Card | null>(null);
-  const [reports, setReports] = useState<number | null>(null);
+  const [geo, setGeo] = useGeoView();
 
   useEffect(() => {
     if (!user) return;
@@ -32,7 +32,6 @@ export default function HomeView() {
       .then((d) => {
         if (!d) return;
         setManager(d.chain?.length ? d.chain[d.chain.length - 1] : null);
-        setReports(d.person?.reports ?? 0);
       })
       .catch(() => {});
   }, [user]);
@@ -90,70 +89,25 @@ export default function HomeView() {
         <AppRail />
       </section>
 
-      <FeaturedCarousel />
+      <FeaturedCarousel view={geo} onView={setGeo} />
 
-      <PolicyHighlights />
-
-      <FounderQuote />
-
-      <div className="grid gap-8 lg:grid-cols-3">
-        <section aria-labelledby="upd-h" className="lg:col-span-2">
+      <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+        <section aria-labelledby="upd-h" className="min-w-0">
           <div className="mb-3 flex items-baseline justify-between">
-            <h2 id="upd-h" className="text-[17px] font-semibold text-ink">Latest updates</h2>
+            <h2 id="upd-h" className="text-[17px] font-semibold text-ink">
+              Latest updates
+            </h2>
             <Link href="/updates" className="flex items-center gap-1 text-[13px] font-medium text-ember hover:underline">
               All updates <IconArrowRight size={14} />
             </Link>
           </div>
-          <UpdatesFeed limit={5} />
+          <UpdatesFeed limit={6} geo={geo} />
         </section>
 
-        <aside aria-labelledby="need-h" className="lg:sticky lg:top-24 lg:self-start">
-          {/* Glow frame: the one yellow surface on the page. */}
-          <div className="rounded-2xl bg-gold p-1.5 shadow-[0_10px_30px_-12px_rgba(234,179,8,0.8)]">
-            <h2 id="need-h" className="px-3 pb-2 pt-1.5 text-[17px] font-semibold text-nil">Need something?</h2>
-          <ul className="divide-y divide-line overflow-hidden rounded-xl bg-panel text-[13.5px]">
-            <li>
-              <Link href="/help" className="flex items-center gap-3 px-4 py-3 hover:bg-ground">
-                <IconTicket size={17} className="text-stone-500" />
-                <span className="flex-1">
-                  <span className="block font-medium text-ink">General ticket</span>
-                  <span className="text-[12.5px] text-stone-500">HR, payroll, WFM, facilities, this portal</span>
-                </span>
-              </Link>
-            </li>
-            <li>
-              <a href={IT_HELPDESK_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 hover:bg-ground">
-                <IconExternal size={17} className="text-stone-500" />
-                <span className="flex-1">
-                  <span className="block font-medium text-ink">IT ticket</span>
-                  <span className="text-[12.5px] text-stone-500">Laptop, network, access, passwords</span>
-                </span>
-              </a>
-            </li>
-            <li>
-              <Link href="/directory" className="flex items-center gap-3 px-4 py-3 hover:bg-ground">
-                <IconPeople size={17} className="text-stone-500" />
-                <span className="flex-1">
-                  <span className="block font-medium text-ink">{can("view_team") ? "My team" : "My reporting line"}</span>
-                  <span className="text-[12.5px] text-stone-500">
-                    {reports ? `${reports} direct report${reports === 1 ? "" : "s"}` : "Your manager and their chain"}
-                  </span>
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link href="/new-hire" className="flex items-center gap-3 px-4 py-3 hover:bg-ground">
-                <IconBook size={17} className="text-stone-500" />
-                <span className="flex-1">
-                  <span className="block font-medium text-ink">New hire guide</span>
-                  <span className="text-[12.5px] text-stone-500">Every tool explained, first-week checklist</span>
-                </span>
-              </Link>
-            </li>
-          </ul>
-          </div>
-        </aside>
+        <MoreFromUs geo={geo} />
       </div>
+
+      <PolicyHighlights />
     </div>
   );
 }

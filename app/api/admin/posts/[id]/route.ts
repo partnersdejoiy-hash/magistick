@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql, rowToPost, logAudit } from "@/lib/db";
 import { requireMe, allowedAudience } from "@/lib/auth";
+import { cleanImageInput, cleanRegion } from "@/lib/postImages";
 import type { PostInput } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -53,6 +54,19 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
     updates.push(`audience = $${i++}`);
     params.push(audience);
   }
+  if (input.region !== undefined) {
+    const region = cleanRegion(input.region);
+    if (region === null) return NextResponse.json({ error: "Region should be Global or a location name." }, { status: 400 });
+    updates.push(`region = $${i++}`);
+    params.push(region);
+  }
+  // "data" means "keep the uploaded banner": lists only ever see that marker.
+  if (input.image !== undefined && input.image !== "data") {
+    const image = cleanImageInput(input.image);
+    if (image === null) return NextResponse.json({ error: "Use a library photo or a JPEG/PNG/WebP under about 650 KB." }, { status: 400 });
+    updates.push(`image = $${i++}`);
+    params.push(image);
+  }
   if (Array.isArray(input.body)) {
     updates.push(`body = $${i++}`);
     params.push(JSON.stringify(input.body.map((p) => String(p).trim()).filter(Boolean)));
@@ -65,7 +79,8 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
   await db.query(`UPDATE posts SET ${updates.join(", ")} WHERE id = $${i}`, params);
   await logAudit(g.me, "post.edit", g.title);
   const rows = (await db`
-    SELECT id, slug, title, excerpt, category, author, date, body, audience
+    SELECT id, slug, title, excerpt, category, author, date, body, audience, region,
+      CASE WHEN image LIKE 'data:%' THEN 'data' ELSE image END AS image
     FROM posts WHERE id = ${ctx.params.id} LIMIT 1
   `) as Record<string, unknown>[];
   if (rows.length === 0) return NextResponse.json({ error: "Not found." }, { status: 404 });
