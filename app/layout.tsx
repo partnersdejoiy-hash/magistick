@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </p>
               <p className="flex flex-wrap gap-x-4 gap-y-1">
                 <Link href="/vision" className="hover:text-ember">
-                  Founders&apos; vision
+                  Founder&apos;s vision
                 </Link>
                 <Link href="/policies" className="hover:text-ember">
                   Policy Center
