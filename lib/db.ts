@@ -128,7 +128,7 @@ const SCHEMA_STATEMENTS = [
 ];
 
 
-/** The real DEJOIY apps (Chronix, OrbitDesk from 2026-10-05; DMail, Shine added 2026-10-22). */
+/** The real DEJOIY apps (Chronix, OrbitDesk from 2026-10-05; DMail, Shine, DEJOIY IT added 2026-10-22). */
 const SEED_APPS = [
   {
     id: "chronix",
@@ -173,6 +173,17 @@ const SEED_APPS = [
     color: "#B45309",
     sort_order: 4,
     logo: "https://app.shine.dejoiy.com/logo.svg",
+  },
+  {
+    id: "dejoiy-it",
+    name: "DEJOIY IT",
+    blurb: "Order equipment, get access, report IT issues",
+    category: "Support",
+    href: "https://it.dejoiy.com",
+    icon: "wrench",
+    color: "#C2185B",
+    sort_order: 5,
+    logo: "https://orbitdesk.dejoiy.com/dejoiy-official-logo.png",
   },
 ];
 
