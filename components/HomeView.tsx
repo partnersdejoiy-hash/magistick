@@ -41,7 +41,7 @@ export default function HomeView() {
       <section aria-labelledby="hello" className="flex flex-wrap items-center justify-between gap-5">
         <div className="flex items-center gap-4">
           {user ? (
-            <span className="rounded-full p-1 shadow-[0_0_22px_2px_rgba(255,196,0,0.45)] ring-2 ring-gold">
+            <span className="rounded-full p-1 shadow-[0_0_22px_2px_rgba(236,64,122,0.45)] ring-2 ring-gold">
               <Avatar id={user.id} v={user.photo_at} name={user.name} dept={user.department} size={52} />
             </span>
           ) : (
@@ -53,7 +53,7 @@ export default function HomeView() {
               {user && (
                 <>
                   ,{" "}
-                  <span className="bg-[linear-gradient(transparent_62%,rgba(255,196,0,0.6)_62%)] px-0.5">{user.name.split(" ")[0]}</span>
+                  <span className="bg-[linear-gradient(transparent_62%,rgba(236,64,122,0.6)_62%)] px-0.5">{user.name.split(" ")[0]}</span>
                 </>
               )}
             </h1>

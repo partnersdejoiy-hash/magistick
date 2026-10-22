@@ -33,16 +33,20 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
   setStr("category", body.category);
   setStr("href", body.href);
   setStr("icon", body.icon);
+  setStr("logo", body.logo);
   setStr("color", body.color);
   if (updates.length === 0) return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
   if (body.href && !/^https?:\/\//i.test(String(body.href))) {
     return NextResponse.json({ error: "URL must start with http(s)://" }, { status: 400 });
   }
+  if (typeof body.logo === "string" && body.logo.trim() && !/^https:\/\//i.test(body.logo.trim())) {
+    return NextResponse.json({ error: "Logo link must start with https://" }, { status: 400 });
+  }
   const db = sql();
   params.push(ctx.params.id);
   await db.query(`UPDATE apps SET ${updates.join(", ")} WHERE id = $${i}`, params);
   const rows = (await db`
-    SELECT id, name, blurb, category, href, icon, color, sort_order
+    SELECT id, name, blurb, category, href, icon, logo, color, sort_order
     FROM apps WHERE id = ${ctx.params.id} LIMIT 1
   `) as DbApp[];
   if (rows.length === 0) return NextResponse.json({ error: "Not found." }, { status: 404 });

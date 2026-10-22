@@ -20,7 +20,7 @@ function Photo({ k, className = "", w = 1600 }: { k: PhotoKey; className?: strin
   return <img src={photoUrl(k, w)} alt="" loading="lazy" decoding="async" className={`h-full w-full object-cover ${className}`} />;
 }
 
-function Sparkle({ className = "", color = "#FFC400" }: { className?: string; color?: string }) {
+function Sparkle({ className = "", color = "#EC407A" }: { className?: string; color?: string }) {
   return (
     <svg viewBox="0 0 16 16" aria-hidden className={`absolute ${className}`}>
       <path d="M8 0l1.9 6.1L16 8l-6.1 1.9L8 16l-1.9-6.1L0 8l6.1-1.9z" fill={color} />
@@ -40,7 +40,7 @@ function Cover({ p }: { p: Policy }) {
       <Photo k={p.photo} className="absolute inset-0" />
       <div className="absolute inset-0" style={{ background: `linear-gradient(100deg, ${p.accent}F2 0%, ${p.accent}B3 38%, rgba(20,20,20,0.15) 75%)` }} />
       <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-      <Sparkle className="right-[8%] top-[10%] h-10 w-10 drop-shadow-[0_0_14px_rgba(255,196,0,0.9)]" />
+      <Sparkle className="right-[8%] top-[10%] h-10 w-10 drop-shadow-[0_0_14px_rgba(236,64,122,0.9)]" />
       <Sparkle className="right-[16%] top-[26%] h-5 w-5" color="#fff" />
       <div className="relative flex h-full min-h-[460px] max-w-2xl flex-col justify-end p-7 sm:p-12">
         <span className="w-fit rounded-full bg-white/20 px-3.5 py-1 text-[12.5px] font-semibold backdrop-blur-sm">{p.kicker}</span>
@@ -70,7 +70,7 @@ function Statement({ p, s }: { p: Policy; s: Extract<Slide, { kind: "statement" 
         <div className="relative hidden overflow-hidden md:block">
           <Photo k={s.photo} w={1000} />
           <div className="absolute inset-y-0 left-0 w-16" style={{ background: `linear-gradient(90deg, ${p.accent}, transparent)` }} />
-          <Sparkle className="bottom-[12%] right-[10%] h-9 w-9 drop-shadow-[0_0_10px_rgba(255,196,0,0.9)]" />
+          <Sparkle className="bottom-[12%] right-[10%] h-9 w-9 drop-shadow-[0_0_10px_rgba(236,64,122,0.9)]" />
         </div>
       )}
     </div>
@@ -165,7 +165,7 @@ function Numbers({ p, s }: { p: Policy; s: Extract<Slide, { kind: "numbers" }> }
         <div className="relative hidden overflow-hidden md:block">
           <Photo k={s.photo} w={1000} />
           <div className="absolute inset-0" style={{ background: `linear-gradient(200deg, transparent 40%, ${p.accent}CC)` }} />
-          <Sparkle className="left-[10%] top-[12%] h-8 w-8 drop-shadow-[0_0_10px_rgba(255,196,0,0.9)]" />
+          <Sparkle className="left-[10%] top-[12%] h-8 w-8 drop-shadow-[0_0_10px_rgba(236,64,122,0.9)]" />
         </div>
       )}
     </div>
@@ -215,7 +215,7 @@ function Contact({ p, s }: { p: Policy; s: Extract<Slide, { kind: "contact" }> }
       </ul>
       <Link
         href="/help"
-        className="btn-magic mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-[14px] font-bold text-nil hover:bg-[#FFD86B]"
+        className="btn-magic mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-[14px] font-bold text-nil hover:bg-[#F48FB1]"
       >
         Go to Get Help <IconArrowRight size={16} />
       </Link>

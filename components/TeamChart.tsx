@@ -117,7 +117,7 @@ export default function TeamChart() {
         <div
           id={`node-${p.id}`}
           className={`relative w-[200px] rounded-2xl border bg-panel p-3 text-left shadow-card transition-all duration-300 ${
-            hit ? "border-gold shadow-[0_0_0_3px_rgba(255,196,0,0.6),0_12px_30px_-10px_rgba(234,179,8,0.8)]" : "border-line hover:-translate-y-0.5 hover:shadow-lift"
+            hit ? "border-gold shadow-[0_0_0_3px_rgba(236,64,122,0.6),0_12px_30px_-10px_rgba(234,179,8,0.8)]" : "border-line hover:-translate-y-0.5 hover:shadow-lift"
           } ${dim ? "opacity-30" : ""}`}
         >
           <span aria-hidden className="absolute inset-x-3 top-0 h-1 rounded-b-full" style={{ backgroundColor: d.dye }} />
@@ -139,7 +139,7 @@ export default function TeamChart() {
                 aria-expanded={isOpen}
                 aria-label={`${isOpen ? "Hide" : "Show"} ${children.length} people reporting to ${p.name}`}
                 className={`flex h-6 shrink-0 items-center gap-1 rounded-full px-2 text-[11px] font-bold transition-colors ${
-                  isOpen ? "bg-nil text-white" : "bg-gold text-nil hover:bg-[#FFD86B]"
+                  isOpen ? "bg-nil text-white" : "bg-gold text-nil hover:bg-[#F48FB1]"
                 }`}
               >
                 {children.length}

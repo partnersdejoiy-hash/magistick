@@ -10,7 +10,7 @@ export async function GET() {
   if ("error" in g) return g.error;
   const { level, department } = g.me;
   const rows = (await sql()`
-    SELECT a.id, a.name, a.blurb, a.category, a.href, a.icon, a.color, a.sort_order
+    SELECT a.id, a.name, a.blurb, a.category, a.href, a.icon, a.logo, a.color, a.sort_order
     FROM apps a
     LEFT JOIN app_permissions p ON p.app_id = a.id AND p.role = ${level}
     WHERE COALESCE(p.allowed, TRUE) = TRUE

@@ -15,7 +15,7 @@ body {
   @apply bg-ground font-sans text-ink antialiased;
   /* Night-sky wash at the top of every page, fading into the indigo-tinted ground. */
   background-image:
-    radial-gradient(1200px 420px at 15% -120px, rgba(255, 196, 0, 0.13), transparent 70%),
+    radial-gradient(1200px 420px at 15% -120px, rgba(233, 30, 99, 0.13), transparent 70%),
     radial-gradient(900px 380px at 90% -80px, rgba(233, 30, 99, 0.06), transparent 70%);
   background-repeat: no-repeat;
 }
@@ -44,7 +44,7 @@ textarea {
 }
 .on-nil :focus-visible,
 .on-nil:focus-visible {
-  outline-color: #ffc400;
+  outline-color: #e91e63;
 }
 
 a {
@@ -68,12 +68,12 @@ a {
 
 /* The page scrollbar itself glows like the stick. */
 html {
-  scrollbar-color: #ffc400 #ebeced;
+  scrollbar-color: #e91e63 #ebeced;
 }
 html::-webkit-scrollbar { width: 10px; }
 html::-webkit-scrollbar-track { background: #ebeced; }
 html::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ffd86b, #ffc400);
+  background: linear-gradient(180deg, #f06292, #e91e63);
   border-radius: 999px;
   border: 2px solid #ebeced;
 }
@@ -149,8 +149,8 @@ html::-webkit-scrollbar-thumb {
 
 /* Glowstick scroll bar (components/Magic.tsx). */
 .glowstick {
-  background: linear-gradient(90deg, #eab308, #ffc400 35%, #ffd86b 75%, #fff6d6);
-  box-shadow: 0 0 10px rgba(255, 196, 0, 0.75), 0 0 24px rgba(255, 196, 0, 0.45);
+  background: linear-gradient(90deg, #ad1457, #e91e63 35%, #f06292 75%, #fce4ec);
+  box-shadow: 0 0 10px rgba(233, 30, 99, 0.75), 0 0 24px rgba(233, 30, 99, 0.45);
   border-radius: 0 3px 3px 0;
 }
 
@@ -178,12 +178,12 @@ html::-webkit-scrollbar-thumb {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s;
-  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 216, 107, 0.28), transparent 65%);
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(240, 98, 146, 0.28), transparent 65%);
 }
 .glow-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 196, 0, 0.55);
-  box-shadow: 0 0 0 1px rgba(255, 196, 0, 0.18), 0 14px 32px -14px rgba(180, 83, 9, 0.45);
+  border-color: rgba(233, 30, 99, 0.55);
+  box-shadow: 0 0 0 1px rgba(233, 30, 99, 0.18), 0 14px 32px -14px rgba(194, 24, 91, 0.45);
 }
 .glow-card:hover::before { opacity: 1; }
 /* Lists keep still and only glow; the rows inside show their own hover. */
@@ -207,7 +207,7 @@ html::-webkit-scrollbar-thumb {
   background: linear-gradient(90deg, transparent, rgba(255, 233, 160, 0.45), transparent);
   transition: transform 0.7s var(--ease-out);
 }
-.btn-magic:hover { box-shadow: 0 0 0 1px rgba(255, 216, 107, 0.5), 0 8px 24px -8px rgba(255, 196, 0, 0.7); }
+.btn-magic:hover { box-shadow: 0 0 0 1px rgba(240, 98, 146, 0.5), 0 8px 24px -8px rgba(233, 30, 99, 0.7); }
 .btn-magic:hover::after { transform: translateX(120%) skewX(-20deg); }
 .btn-magic:active { transform: scale(0.97); }
 
@@ -222,9 +222,9 @@ html::-webkit-scrollbar-thumb {
   width: 12px;
   height: 12px;
   pointer-events: none;
-  background: radial-gradient(circle, #fff8dc 0%, #ffd86b 45%, #ffc400 100%);
+  background: radial-gradient(circle, #fff0f6 0%, #f06292 45%, #e91e63 100%);
   clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-  filter: drop-shadow(0 0 4px rgba(255, 196, 0, 0.9));
+  filter: drop-shadow(0 0 4px rgba(233, 30, 99, 0.9));
   animation: sparkle 0.9s var(--ease-out) forwards;
 }
 
@@ -272,8 +272,8 @@ html::-webkit-scrollbar-thumb {
 
 /* The logo star breathes and spins a little on hover. */
 @keyframes glint {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 216, 107, 0); }
-  50% { box-shadow: 0 0 14px 2px rgba(255, 216, 107, 0.55); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(240, 98, 146, 0); }
+  50% { box-shadow: 0 0 14px 2px rgba(240, 98, 146, 0.55); }
 }
 .logo-glint { animation: glint 3.2s ease-in-out infinite; }
 .logo-glint svg { transition: transform 0.6s var(--ease-out); }

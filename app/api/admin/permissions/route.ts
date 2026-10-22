@@ -13,7 +13,7 @@ export async function GET() {
   if ("error" in g) return g.error;
   const db = sql();
   const apps = (await db`
-    SELECT id, name, blurb, category, href, icon, color, sort_order FROM apps ORDER BY sort_order ASC, name ASC
+    SELECT id, name, blurb, category, href, icon, logo, color, sort_order FROM apps ORDER BY sort_order ASC, name ASC
   `) as DbApp[];
   const perms = (await db`SELECT app_id, role, allowed FROM app_permissions`) as {
     app_id: string;
