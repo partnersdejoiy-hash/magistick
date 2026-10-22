@@ -110,7 +110,7 @@ export default function FounderHero() {
           {/* Rotating gold halo, drifting with the pointer. */}
           <div aria-hidden className="absolute left-1/2 top-[44%] h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 sm:h-[380px] sm:w-[380px]">
             <motion.div style={{ x: haloX, y: haloY }} className="absolute inset-0">
-              <div className="absolute inset-0 animate-[spin_18s_linear_infinite] rounded-full bg-[conic-gradient(from_0deg,#FFC400,transparent_30%,#E91E63_55%,transparent_75%,#FFC400)] opacity-70 blur-md motion-reduce:animate-none" />
+              <div className="absolute inset-0 animate-[spin_18s_linear_infinite] rounded-full bg-[conic-gradient(from_0deg,#EC407A,transparent_30%,#E91E63_55%,transparent_75%,#EC407A)] opacity-70 blur-md motion-reduce:animate-none" />
               <div className="absolute inset-3 rounded-full bg-nil" />
               <div className="absolute inset-3 rounded-full bg-gradient-to-b from-gold/25 to-transparent" />
             </motion.div>
@@ -128,7 +128,7 @@ export default function FounderHero() {
               animate={reduce ? undefined : { scale: [1, 1.4, 1], rotate: [0, 45, 0], opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 3, delay: s.d, repeat: Infinity, ease: "easeInOut" }}
             >
-              <path d="M8 0l1.9 6.1L16 8l-6.1 1.9L8 16l-1.9-6.1L0 8l6.1-1.9z" fill={k % 2 === 0 ? "#FFC400" : "#fff"} />
+              <path d="M8 0l1.9 6.1L16 8l-6.1 1.9L8 16l-1.9-6.1L0 8l6.1-1.9z" fill={k % 2 === 0 ? "#EC407A" : "#fff"} />
             </motion.svg>
           ))}
 

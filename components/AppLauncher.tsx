@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { APP_ICONS, IconPin } from "./icons";
+import { IconPin } from "./icons";
 import { loadPins, savePins } from "./pins";
 
 export type LauncherApp = {
@@ -11,11 +11,10 @@ export type LauncherApp = {
   category: string;
   href: string;
   icon: string;
+  logo?: string;
   color: string;
 };
 
-const iconFor = (key: string) =>
-  (APP_ICONS as Record<string, (p: { size?: number }) => JSX.Element>)[key] ?? APP_ICONS.globe;
 
 /** Fetches the apps this person's level + department may open. */
 export function useApps() {
@@ -48,15 +47,32 @@ export function usePins() {
   return { pins, toggle };
 }
 
+/** The app's own logo; if it has none (or it fails to load), its initial on the app colour. */
 export function AppGlyph({ app, size = 44 }: { app: LauncherApp; size?: number }) {
-  const Icon = iconFor(app.icon);
+  const [broken, setBroken] = useState(false);
+  const box = { width: size, height: size };
+  if (app.logo && !broken) {
+    return (
+      <span className="flex shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-white" style={box} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- external app logos, any host */}
+        <img
+          src={app.logo}
+          alt=""
+          className="h-full w-full object-contain p-[12%]"
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          onError={() => setBroken(true)}
+        />
+      </span>
+    );
+  }
   return (
     <span
-      className="flex shrink-0 items-center justify-center rounded-xl text-white"
-      style={{ width: size, height: size, backgroundColor: app.color }}
+      className="flex shrink-0 items-center justify-center rounded-xl font-display font-semibold text-white"
+      style={{ ...box, backgroundColor: app.color, fontSize: Math.round(size * 0.46) }}
       aria-hidden
     >
-      <Icon size={Math.round(size * 0.48)} />
+      {app.name.trim().charAt(0).toUpperCase()}
     </span>
   );
 }

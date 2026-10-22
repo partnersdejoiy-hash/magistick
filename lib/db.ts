@@ -123,6 +123,8 @@ const SCHEMA_STATEMENTS = [
      AS m(old, level) ON m.old = p.role
    ON CONFLICT (app_id, role) DO NOTHING`,
   `DELETE FROM app_permissions WHERE role IN ('collaborator', 'employee')`,
+  // The app's own logo (https URL); empty = show the app's initial.
+  `ALTER TABLE apps ADD COLUMN IF NOT EXISTS logo TEXT NOT NULL DEFAULT ''`,
 ];
 
 
@@ -137,6 +139,7 @@ const SEED_APPS = [
     icon: "clock",
     color: "#2563EB",
     sort_order: 1,
+    logo: "",
   },
   {
     id: "orbitdesk",
@@ -147,6 +150,7 @@ const SEED_APPS = [
     icon: "ticket",
     color: "#7C3AED",
     sort_order: 2,
+    logo: "https://orbitdesk.dejoiy.com/favicon.png",
   },
   {
     id: "dmail",
@@ -157,6 +161,7 @@ const SEED_APPS = [
     icon: "mail",
     color: "#E91E63",
     sort_order: 3,
+    logo: "https://mail.dejoiy.com/assets/icons/apple-touch-icon.png",
   },
   {
     id: "shine",
@@ -167,6 +172,7 @@ const SEED_APPS = [
     icon: "video",
     color: "#B45309",
     sort_order: 4,
+    logo: "https://app.shine.dejoiy.com/logo.svg",
   },
 ];
 
@@ -186,6 +192,8 @@ export function ensureSchema(): Promise<void> {
           INSERT INTO apps (id, name, blurb, category, href, icon, color, sort_order)
           VALUES (${a.id}, ${a.name}, ${a.blurb}, ${a.category}, ${a.href}, ${a.icon}, ${a.color}, ${a.sort_order})
           ON CONFLICT (id) DO NOTHING`;
+        // Fill the logo once; an admin's own logo is never overwritten.
+        if (a.logo) await db`UPDATE apps SET logo = ${a.logo} WHERE id = ${a.id} AND logo = ''`;
         for (const role of LEVEL_IDS) {
           await db`
             INSERT INTO app_permissions (app_id, role, allowed)
@@ -225,6 +233,7 @@ export type DbApp = {
   category: string;
   href: string;
   icon: string;
+  logo: string;
   color: string;
   sort_order: number;
 };

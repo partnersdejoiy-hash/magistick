@@ -7,7 +7,7 @@ import { FOUNDER, MISSION, NAME_MEANING, PROMISES, SPEECH, VISION } from "@/lib/
 
 export const metadata: Metadata = { title: "Founder's Vision — magistick" };
 
-function Sparkle({ className = "", color = "#FFC400" }: { className?: string; color?: string }) {
+function Sparkle({ className = "", color = "#EC407A" }: { className?: string; color?: string }) {
   return (
     <svg viewBox="0 0 16 16" aria-hidden className={`absolute ${className}`}>
       <path d="M8 0l1.9 6.1L16 8l-6.1 1.9L8 16l-1.9-6.1L0 8l6.1-1.9z" fill={color} />
@@ -15,7 +15,7 @@ function Sparkle({ className = "", color = "#FFC400" }: { className?: string; co
   );
 }
 
-const PART_COLORS = ["#E91E63", "#FFC400", "#14B8A6"];
+const PART_COLORS = ["#E91E63", "#EC407A", "#14B8A6"];
 
 /** Founder's Vision: founder hero, what DEJOIY means, the six letter-values, vision & mission, her address, and promises. */
 export default function VisionPage() {
@@ -64,7 +64,7 @@ export default function VisionPage() {
         <div className="mb-8 max-w-2xl">
           <p className="text-[12px] font-bold uppercase tracking-wider text-ember">Our core values</p>
           <h2 id="values-h" className="mt-2 text-[32px] font-semibold leading-tight text-ink sm:text-[40px]">
-            Six letters. <span className="bg-[linear-gradient(transparent_62%,rgba(255,196,0,0.6)_62%)]">Six values.</span>
+            Six letters. <span className="bg-[linear-gradient(transparent_62%,rgba(236,64,122,0.6)_62%)]">Six values.</span>
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-stone-600">Tap a letter to see what it stands for, and what it looks like on the floor.</p>
         </div>
@@ -109,7 +109,7 @@ export default function VisionPage() {
             <p className="font-display text-[20px] font-semibold text-ink">{closing}</p>
           </div>
           <div className="mt-10 flex items-center gap-4 border-t border-line pt-6">
-            <span className="h-16 w-16 overflow-hidden rounded-full bg-nil ring-2 ring-gold shadow-[0_0_20px_rgba(255,196,0,0.35)]">
+            <span className="h-16 w-16 overflow-hidden rounded-full bg-nil ring-2 ring-gold shadow-[0_0_20px_rgba(236,64,122,0.35)]">
               {/* eslint-disable-next-line @next/next/no-img-element -- local portrait */}
               <img src={FOUNDER.photo} alt="" className="h-full w-full object-cover object-top" />
             </span>
@@ -152,7 +152,7 @@ export default function VisionPage() {
           ))}
         </dl>
         <div className="mt-9 flex flex-wrap gap-3">
-          <Link href="/policies" className="btn-magic inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-[14px] font-bold text-nil hover:bg-[#FFD86B]">
+          <Link href="/policies" className="btn-magic inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-[14px] font-bold text-nil hover:bg-[#F48FB1]">
             See how it works in our policies <IconArrowRight size={16} />
           </Link>
           <Link href="/help" className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold text-white ring-1 ring-white/30 hover:ring-gold">

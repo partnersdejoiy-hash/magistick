@@ -2,14 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AppGlyph, type LauncherApp } from "../AppLauncher";
-import { APP_ICONS, IconPlus } from "../icons";
+import { IconPlus } from "../icons";
 import { api, btn, Field, inputCls, Notice, SectionHead } from "./ui";
 
-const ICON_CHOICES = Object.keys(APP_ICONS) as (keyof typeof APP_ICONS)[];
 // App colours borrow the department dyes so tiles sit inside the same world.
 const COLOR_CHOICES = ["#2B3A8C", "#B3261E", "#B7791F", "#2F6B3B", "#1F6F78", "#B0386A", "#C2561A", "#0E7C6B"];
 
-const empty = { name: "", href: "", blurb: "", category: "Tools", icon: "globe", color: COLOR_CHOICES[0] };
+const empty = { name: "", href: "", blurb: "", category: "Tools", logo: "", color: COLOR_CHOICES[0] };
 
 /** The launcher catalog: add, edit, remove apps. Who sees each app lives in App access. */
 export default function Apps() {
@@ -89,7 +88,7 @@ export default function Apps() {
                   className="text-[13px] font-medium text-ember hover:underline"
                   onClick={() => {
                     setEditId(a.id);
-                    setForm({ name: a.name, href: a.href, blurb: a.blurb, category: a.category, icon: a.icon, color: a.color });
+                    setForm({ name: a.name, href: a.href, blurb: a.blurb, category: a.category, logo: a.logo ?? "", color: a.color });
                   }}
                 >
                   Edit
@@ -116,30 +115,19 @@ export default function Apps() {
           <Field label="Category">
             <input className={inputCls} value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
           </Field>
-          <fieldset>
-            <legend className="mb-1 text-[12.5px] font-medium text-stone-700">Icon</legend>
-            <div className="flex flex-wrap gap-1.5">
-              {ICON_CHOICES.map((k) => {
-                const I = APP_ICONS[k];
-                return (
-                  <button
-                    key={k}
-                    type="button"
-                    aria-pressed={form.icon === k}
-                    aria-label={`Icon ${k}`}
-                    onClick={() => setForm({ ...form, icon: k })}
-                    className={`flex h-8 w-8 items-center justify-center rounded-md border ${
-                      form.icon === k ? "border-ember bg-ember-tint text-ember" : "border-line text-stone-500 hover:text-ink"
-                    }`}
-                  >
-                    <I size={16} />
-                  </button>
-                );
-              })}
+          <Field label="Logo link (optional)">
+            <div className="flex items-center gap-2">
+              <AppGlyph key={form.logo} app={{ id: "preview", name: form.name || "App", blurb: "", category: "", href: "", icon: "", logo: form.logo, color: form.color }} size={36} />
+              <input
+                className={inputCls}
+                placeholder="https://… the app's own icon"
+                value={form.logo}
+                onChange={(e) => setForm({ ...form, logo: e.target.value })}
+              />
             </div>
-          </fieldset>
+          </Field>
           <fieldset>
-            <legend className="mb-1 text-[12.5px] font-medium text-stone-700">Colour</legend>
+            <legend className="mb-1 text-[12.5px] font-medium text-stone-700">Colour (when there is no logo)</legend>
             <div className="flex flex-wrap gap-1.5">
               {COLOR_CHOICES.map((c) => (
                 <button

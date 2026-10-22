@@ -20,8 +20,8 @@ const config: Config = {
         ink: "#262626",
         inksoft: "#333333",
         line: "#E1E2E4",
-        ember: { DEFAULT: "#B45309", deep: "#92400E", tint: "#FAF0DC", ink: "#7C4A03" }, // brass: primary action
-        gold: { DEFAULT: "#FFC400", deep: "#EAB308", tint: "#FFF4CC", ink: "#6B4E00" }, // Glowstick yellow: glow + small marks
+        ember: { DEFAULT: "#C2185B", deep: "#AD1457", tint: "#FCE4EC", ink: "#880E4F" }, // DEJOIY magenta: primary action
+        gold: { DEFAULT: "#EC407A", deep: "#D81B60", tint: "#FCE4EC", ink: "#880E4F" }, // DEJOIY magenta glow + small marks (token name kept)
         magenta: { DEFAULT: "#E91E63", deep: "#C2185B", tint: "#FCE3EE" }, // active nav
         ok: { DEFAULT: "#2F6B3B", tint: "#E3F0E5" },
         warn: { DEFAULT: "#8A5A12", tint: "#FFF4CC" },

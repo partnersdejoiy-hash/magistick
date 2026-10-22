@@ -16,7 +16,7 @@ export async function GET() {
   if ("error" in g) return g.error;
   const db = sql();
   const rows = (await db`
-    SELECT id, name, blurb, category, href, icon, color, sort_order
+    SELECT id, name, blurb, category, href, icon, logo, color, sort_order
     FROM apps ORDER BY sort_order ASC, name ASC
   `) as DbApp[];
   return NextResponse.json({ apps: rows });
@@ -38,6 +38,10 @@ export async function POST(req: NextRequest) {
   if (!/^https?:\/\//i.test(href)) {
     return NextResponse.json({ error: "URL must start with http(s)://" }, { status: 400 });
   }
+  const logo = (body.logo ?? "").trim();
+  if (logo && !/^https:\/\//i.test(logo)) {
+    return NextResponse.json({ error: "Logo link must start with https://" }, { status: 400 });
+  }
   const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `app-${Date.now()}`;
   const db = sql();
   const existing = (await db`SELECT id FROM apps WHERE id = ${id} LIMIT 1`) as { id: string }[];
@@ -51,12 +55,13 @@ export async function POST(req: NextRequest) {
     category: (body.category ?? "Tools").trim() || "Tools",
     href,
     icon: (body.icon ?? "globe").trim() || "globe",
+    logo,
     color: (body.color ?? "#2563EB").trim() || "#2563EB",
     sort_order: 99,
   };
   await db`
-    INSERT INTO apps (id, name, blurb, category, href, icon, color, sort_order)
-    VALUES (${app.id}, ${app.name}, ${app.blurb}, ${app.category}, ${app.href}, ${app.icon}, ${app.color}, ${app.sort_order})`;
+    INSERT INTO apps (id, name, blurb, category, href, icon, logo, color, sort_order)
+    VALUES (${app.id}, ${app.name}, ${app.blurb}, ${app.category}, ${app.href}, ${app.icon}, ${app.logo}, ${app.color}, ${app.sort_order})`;
   for (const role of LEVEL_IDS) {
     await db`INSERT INTO app_permissions (app_id, role, allowed) VALUES (${id}, ${role}, TRUE)`;
   }

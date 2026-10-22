@@ -154,7 +154,7 @@ export const CATEGORIES: Category[] = [
     name: "magistick portal",
     blurb: "Access, bugs and ideas for this portal",
     icon: "award",
-    color: "#FFC400",
+    color: "#EC407A",
     orbitDepartments: ["magistick", "Portal", "IT"],
     subcategories: [
       { name: "Can't open an app", hint: "Which app, and what you see." },

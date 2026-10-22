@@ -12,13 +12,13 @@ import { APP_ICONS } from "./icons";
 type Theme = { bg: string; a: string; b: string; icon: keyof typeof APP_ICONS };
 
 const THEMES: Record<string, Theme> = {
-  Announcements: { bg: "bg-gradient-to-br from-[#2A0F4C] via-[#5B1A7A] to-[#E91E63]", a: "#FFC400", b: "#FF7AB6", icon: "chat" },
-  Support: { bg: "bg-gradient-to-br from-[#062A3A] via-[#0B5563] to-[#14B8A6]", a: "#FFC400", b: "#5EEAD4", icon: "ticket" },
+  Announcements: { bg: "bg-gradient-to-br from-[#2A0F4C] via-[#5B1A7A] to-[#E91E63]", a: "#EC407A", b: "#FF7AB6", icon: "chat" },
+  Support: { bg: "bg-gradient-to-br from-[#062A3A] via-[#0B5563] to-[#14B8A6]", a: "#EC407A", b: "#5EEAD4", icon: "ticket" },
   Workforce: { bg: "bg-gradient-to-br from-[#2B1400] via-[#9A3412] to-[#F59E0B]", a: "#FFF1C2", b: "#FDBA74", icon: "clock" },
-  IT: { bg: "bg-gradient-to-br from-[#0B1E4A] via-[#1D4ED8] to-[#38BDF8]", a: "#FFC400", b: "#93C5FD", icon: "wrench" },
-  Culture: { bg: "bg-gradient-to-br from-[#3A0A1E] via-[#BE123C] to-[#FB7185]", a: "#FFC400", b: "#FDA4AF", icon: "award" },
+  IT: { bg: "bg-gradient-to-br from-[#0B1E4A] via-[#1D4ED8] to-[#38BDF8]", a: "#EC407A", b: "#93C5FD", icon: "wrench" },
+  Culture: { bg: "bg-gradient-to-br from-[#3A0A1E] via-[#BE123C] to-[#FB7185]", a: "#EC407A", b: "#FDA4AF", icon: "award" },
 };
-const FALLBACK: Theme = { bg: "bg-gradient-to-br from-[#1A1A1A] via-[#333333] to-[#6B5300]", a: "#FFC400", b: "#FFD86B", icon: "globe" };
+const FALLBACK: Theme = { bg: "bg-gradient-to-br from-[#1A1A1A] via-[#333333] to-[#6B5300]", a: "#EC407A", b: "#F48FB1", icon: "globe" };
 
 export function themeFor(category: string): Theme {
   const c = category.toLowerCase();
@@ -91,7 +91,7 @@ export default function HeroArt({ category, date }: { category: string; date: st
           <div className="mt-2 h-2 w-36 rounded-full bg-stone-200" />
           <div className="mt-1.5 h-2 w-24 rounded-full bg-stone-200" />
           <div className="mt-4 flex items-center">
-            {["#E91E63", "#14B8A6", "#FFC400"].map((c, i) => (
+            {["#E91E63", "#14B8A6", "#EC407A"].map((c, i) => (
               <span key={c} className="-ml-1.5 h-6 w-6 rounded-full ring-2 ring-white first:ml-0" style={{ backgroundColor: c, zIndex: 3 - i }} />
             ))}
             <span className="ml-2 text-[11px] font-semibold text-stone-500">+ team</span>
@@ -102,7 +102,7 @@ export default function HeroArt({ category, date }: { category: string; date: st
       {/* Stickers. */}
       <motion.div {...float(1.2, 10)} className="absolute bottom-[12%] left-[10%]">
         <span className="inline-flex -rotate-[8deg] items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-nil shadow-xl">
-          <span style={{ color: t.b === "#FFD86B" ? "#B45309" : "#E91E63" }}>✦</span> {category}
+          <span style={{ color: t.b === "#F48FB1" ? "#AD1457" : "#E91E63" }}>✦</span> {category}
         </span>
       </motion.div>
       <motion.div {...float(2, 7)} className="absolute bottom-[6%] right-[6%]">

@@ -101,7 +101,7 @@ export default function FeaturedCarousel({ view, onView }: { view: GeoView; onVi
                   <p className="mt-3 line-clamp-3 max-w-[56ch] text-[15px] leading-relaxed text-white/85">{p.excerpt}</p>
                   <Link
                     href={`/updates/${p.slug}`}
-                    className="btn-magic mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-[14px] font-bold text-nil shadow-lg hover:bg-[#FFD86B]"
+                    className="btn-magic mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-[14px] font-bold text-nil shadow-lg hover:bg-[#F48FB1]"
                   >
                     Learn more <span aria-hidden>→</span>
                   </Link>
@@ -169,7 +169,7 @@ export default function FeaturedCarousel({ view, onView }: { view: GeoView; onVi
               onClick={() => setI(k)}
               aria-label={`Show update ${k + 1} of ${n}`}
               aria-current={k === i}
-              className={`on-nil h-2.5 rounded-full transition-all duration-300 ${k === i ? "w-7 bg-gold shadow-[0_0_10px_rgba(255,196,0,0.8)]" : "w-2.5 bg-white/40 hover:bg-white/70"}`}
+              className={`on-nil h-2.5 rounded-full transition-all duration-300 ${k === i ? "w-7 bg-gold shadow-[0_0_10px_rgba(236,64,122,0.8)]" : "w-2.5 bg-white/40 hover:bg-white/70"}`}
             />
           ))}
         </div>
