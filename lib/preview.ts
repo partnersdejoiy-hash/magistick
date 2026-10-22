@@ -12,7 +12,7 @@ export const PREVIEW_APPS = [
   ["orbitdesk", "OrbitDesk", "Support tickets & help desk", "Support", "https://orbitdesk.dejoiy.com", "ticket", "#7C3AED", "https://orbitdesk.dejoiy.com/favicon.png"],
   ["dmail", "DMail", "Your DEJOIY company mail", "Work", "https://mail.dejoiy.com", "mail", "#E91E63", "https://mail.dejoiy.com/assets/icons/apple-touch-icon.png"],
   ["shine", "Shine", "Meetings, chat & team communication", "Comms", "https://app.shine.dejoiy.com", "video", "#B45309", "https://app.shine.dejoiy.com/logo.svg"],
-  ["dejoiy-it", "DEJOIY IT", "Order equipment, get access, report IT issues", "Support", "https://it.dejoiy.com", "wrench", "#C2185B", "https://orbitdesk.dejoiy.com/dejoiy-official-logo.png"],
+  ["dejoiy-it", "DEJOIY IT", "Order equipment, get access, report IT issues", "Support", "https://serve-me-now.dejoiy.com", "wrench", "#C2185B", "https://orbitdesk.dejoiy.com/dejoiy-official-logo.png"],
 ].map(([id, name, blurb, category, href, icon, color, logo], i) => ({ id, name, blurb, category, href, icon, color, logo, sort_order: i + 1 }));
 
 /**
