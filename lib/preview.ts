@@ -8,17 +8,11 @@ export const UI_PREVIEW = process.env.VERCEL_ENV === "preview" && process.env.UI
 
 /** Sample content so the preview shows a filled-in UI without a database. Preview only. */
 export const PREVIEW_APPS = [
-  ["chronix", "Chronix", "Your Chronix workspace", "Work", "clock", "#2563EB"],
-  ["orbitdesk", "OrbitDesk", "Support tickets & help desk", "Support", "ticket", "#7C3AED"],
-  ["payroll", "Payroll", "Payslips & tax (sample)", "HR", "wallet", "#16A34A"],
-  ["attendance", "Attendance", "Shifts & punches (sample)", "WFM", "gauge", "#EA580C"],
-  ["leave", "Leave", "Apply & track leave (sample)", "HR", "plane", "#0891B2"],
-  ["learning", "Learning", "Courses & certifications (sample)", "Growth", "book", "#DB2777"],
-  ["rewards", "Rewards", "Shout-outs & awards (sample)", "Culture", "award", "#CA8A04"],
-  ["ideas", "Ideas", "Suggest an improvement (sample)", "Culture", "bulb", "#9333EA"],
-  ["referrals", "Referrals", "Refer a friend (sample)", "HR", "userplus", "#0D9488"],
-  ["townhall", "Town Hall", "Live sessions (sample)", "Comms", "video", "#E11D48"],
-].map(([id, name, blurb, category, icon, color], i) => ({ id, name, blurb, category, href: "#", icon, color, sort_order: i + 1 }));
+  ["chronix", "Chronix", "Your Chronix workspace", "Work", "https://chronix.dejoiy.com", "clock", "#2563EB"],
+  ["orbitdesk", "OrbitDesk", "Support tickets & help desk", "Support", "https://orbitdesk.dejoiy.com", "ticket", "#7C3AED"],
+  ["dmail", "DMail", "Your DEJOIY company mail", "Work", "https://mail.dejoiy.com", "mail", "#E91E63"],
+  ["shine", "Shine", "Meetings, chat & team communication", "Comms", "https://app.shine.dejoiy.com", "video", "#B45309"],
+].map(([id, name, blurb, category, href, icon, color], i) => ({ id, name, blurb, category, href, icon, color, sort_order: i + 1 }));
 
 /**
  * Sample org for the preview's team chart: DEJOIY's people as listed on
