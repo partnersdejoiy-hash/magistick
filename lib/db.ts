@@ -125,6 +125,8 @@ const SCHEMA_STATEMENTS = [
   `DELETE FROM app_permissions WHERE role IN ('collaborator', 'employee')`,
   // The app's own logo (https URL); empty = show the app's initial.
   `ALTER TABLE apps ADD COLUMN IF NOT EXISTS logo TEXT NOT NULL DEFAULT ''`,
+  // DEJOIY IT moved to serve-me-now.dejoiy.com (only rewrites the old seeded link).
+  `UPDATE apps SET href = 'https://serve-me-now.dejoiy.com' WHERE id = 'dejoiy-it' AND href = 'https://it.dejoiy.com'`,
 ];
 
 
@@ -179,7 +181,7 @@ const SEED_APPS = [
     name: "DEJOIY IT",
     blurb: "Order equipment, get access, report IT issues",
     category: "Support",
-    href: "https://it.dejoiy.com",
+    href: "https://serve-me-now.dejoiy.com",
     icon: "wrench",
     color: "#C2185B",
     sort_order: 5,
