@@ -126,7 +126,7 @@ const SCHEMA_STATEMENTS = [
 ];
 
 
-/** The two real launch apps, per Deepak (2026-10-05). */
+/** The real DEJOIY apps (Chronix, OrbitDesk from 2026-10-05; DMail, Shine added 2026-10-22). */
 const SEED_APPS = [
   {
     id: "chronix",
@@ -147,6 +147,26 @@ const SEED_APPS = [
     icon: "ticket",
     color: "#7C3AED",
     sort_order: 2,
+  },
+  {
+    id: "dmail",
+    name: "DMail",
+    blurb: "Your DEJOIY company mail",
+    category: "Work",
+    href: "https://mail.dejoiy.com",
+    icon: "mail",
+    color: "#E91E63",
+    sort_order: 3,
+  },
+  {
+    id: "shine",
+    name: "Shine",
+    blurb: "Meetings, chat & team communication",
+    category: "Comms",
+    href: "https://app.shine.dejoiy.com",
+    icon: "video",
+    color: "#B45309",
+    sort_order: 4,
   },
 ];
 

@@ -229,6 +229,7 @@ export const APP_ICONS = {
   userplus: IconUserPlus,
   gauge: IconGauge,
   ticket: IconTicket,
+  mail: IconInbox,
   globe: IconGlobe,
 } as const;
 
