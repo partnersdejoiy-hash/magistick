@@ -8,11 +8,11 @@ export const UI_PREVIEW = process.env.VERCEL_ENV === "preview" && process.env.UI
 
 /** Sample content so the preview shows a filled-in UI without a database. Preview only. */
 export const PREVIEW_APPS = [
-  ["chronix", "Chronix", "Your Chronix workspace", "Work", "https://chronix.dejoiy.com", "clock", "#2563EB"],
-  ["orbitdesk", "OrbitDesk", "Support tickets & help desk", "Support", "https://orbitdesk.dejoiy.com", "ticket", "#7C3AED"],
-  ["dmail", "DMail", "Your DEJOIY company mail", "Work", "https://mail.dejoiy.com", "mail", "#E91E63"],
-  ["shine", "Shine", "Meetings, chat & team communication", "Comms", "https://app.shine.dejoiy.com", "video", "#B45309"],
-].map(([id, name, blurb, category, href, icon, color], i) => ({ id, name, blurb, category, href, icon, color, sort_order: i + 1 }));
+  ["chronix", "Chronix", "Your Chronix workspace", "Work", "https://chronix.dejoiy.com", "clock", "#2563EB", ""],
+  ["orbitdesk", "OrbitDesk", "Support tickets & help desk", "Support", "https://orbitdesk.dejoiy.com", "ticket", "#7C3AED", "https://orbitdesk.dejoiy.com/favicon.png"],
+  ["dmail", "DMail", "Your DEJOIY company mail", "Work", "https://mail.dejoiy.com", "mail", "#E91E63", "https://mail.dejoiy.com/assets/icons/apple-touch-icon.png"],
+  ["shine", "Shine", "Meetings, chat & team communication", "Comms", "https://app.shine.dejoiy.com", "video", "#B45309", "https://app.shine.dejoiy.com/logo.svg"],
+].map(([id, name, blurb, category, href, icon, color, logo], i) => ({ id, name, blurb, category, href, icon, color, logo, sort_order: i + 1 }));
 
 /**
  * Sample org for the preview's team chart: DEJOIY's people as listed on
