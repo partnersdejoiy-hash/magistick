@@ -1,0 +1,40 @@
+name: BPO database backup
+
+# Nightly encrypted backup of the DEJOIY BPO Supabase database (Mumbai).
+# Restore: gpg --decrypt file.dump.gpg > file.dump && pg_restore -d "$URL" file.dump
+on:
+  schedule:
+    - cron: "30 20 * * *" # 02:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Dump and encrypt
+        env:
+          BPO_DATABASE_URL: ${{ secrets.BPO_DATABASE_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$BPO_DATABASE_URL" || { echo "BPO_DATABASE_URL secret missing"; exit 1; }
+          test -n "$BACKUP_PASSPHRASE" || { echo "BACKUP_PASSPHRASE secret missing"; exit 1; }
+          name="dejoiy-bpo-$(date -u +%Y-%m-%d).dump"
+          docker run --rm -e URL="$BPO_DATABASE_URL" postgres:17 \
+            sh -c 'pg_dump "$URL" -Fc --no-owner --no-privileges -n core -n helpdesk -n it -n portal -n public' > "$name"
+          test -s "$name"
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" \
+            --symmetric --cipher-algo AES256 -o "$name.gpg" "$name"
+          rm "$name"
+          ls -lh "$name.gpg"
+          echo "FILE=$name.gpg" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILE }}
+          path: ${{ env.FILE }}
+          retention-days: 30
