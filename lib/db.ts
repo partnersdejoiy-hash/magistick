@@ -1,23 +1,41 @@
-import { neon } from "@neondatabase/serverless";
+import pg from "pg";
 import { randomUUID } from "crypto";
 import { ARTICLES } from "./data";
 import { LEVEL_IDS } from "./rbac";
 import { postImageUrl } from "./postImages";
 
 /**
- * Postgres (Neon) access for magistick phase 2.
+ * Postgres access for magistick (DEJOIY BPO Supabase, schema "portal").
  *
  * Tables are created lazily via ensureSchema() — CREATE TABLE IF NOT EXISTS,
  * so the first API call after deploy self-initializes. No separate migration
  * step; Deepak only adds DATABASE_URL in Vercel env vars.
+ *
+ * sql() keeps the same shape the code used with Neon: a tagged template
+ * (sql()`SELECT ... WHERE id = ${id}`) and .query(text, params), both
+ * resolving to the result rows.
  */
 
-let _sql: ReturnType<typeof neon> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Rows = Record<string, any>[];
+type Sql = {
+  (strings: TemplateStringsArray, ...values: unknown[]): Promise<Rows>;
+  query(text: string, params?: unknown[]): Promise<Rows>;
+};
 
-export function sql() {
+let _sql: Sql | null = null;
+
+export function sql(): Sql {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set — add it in Vercel env vars.");
-  if (!_sql) _sql = neon(url);
+  if (!_sql) {
+    const pool = new pg.Pool({ connectionString: url, max: 3, idleTimeoutMillis: 10_000, connectionTimeoutMillis: 5_000 });
+    const query = async (text: string, params: unknown[] = []) => (await pool.query(text, params)).rows as Rows;
+    const tag = ((strings: TemplateStringsArray, ...values: unknown[]) =>
+      query(strings.reduce((text, part, i) => `${text}$${i}${part}`), values)) as Sql;
+    tag.query = query;
+    _sql = tag;
+  }
   return _sql;
 }
 
