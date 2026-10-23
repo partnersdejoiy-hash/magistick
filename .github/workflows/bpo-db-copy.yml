@@ -1,0 +1,66 @@
+name: BPO database copy
+
+# Copies one app's current database (Neon, schema public) into its own schema
+# in the DEJOIY BPO Supabase database. Re-running replaces the target schema.
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: "Which app to copy"
+        type: choice
+        options: [orbitdesk, magistick]
+
+permissions:
+  contents: read
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      scratch:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: scratch
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 2s --health-retries 20
+    env:
+      SCRATCH: postgresql://postgres:scratch@localhost:5432/postgres
+    steps:
+      - name: Pick source and target
+        env:
+          APP: ${{ inputs.app }}
+          ORBITDESK_SOURCE_URL: ${{ secrets.ORBITDESK_SOURCE_URL }}
+          ORBITDESK_TARGET_URL: ${{ secrets.ORBITDESK_TARGET_URL }}
+          MAGISTICK_SOURCE_URL: ${{ secrets.MAGISTICK_SOURCE_URL }}
+          MAGISTICK_TARGET_URL: ${{ secrets.MAGISTICK_TARGET_URL }}
+        run: |
+          set -euo pipefail
+          if [ "$APP" = orbitdesk ]; then src="$ORBITDESK_SOURCE_URL"; dst="$ORBITDESK_TARGET_URL"; schema=helpdesk
+          else src="$MAGISTICK_SOURCE_URL"; dst="$MAGISTICK_TARGET_URL"; schema=portal; fi
+          test -n "$src" || { echo "Source URL secret for $APP is missing"; exit 1; }
+          test -n "$dst" || { echo "Target URL secret for $APP is missing"; exit 1; }
+          echo "::add-mask::$src"; echo "::add-mask::$dst"
+          { echo "SRC=$src"; echo "DST=$dst"; echo "SCHEMA=$schema"; } >> "$GITHUB_ENV"
+
+      - name: Copy public -> ${{ inputs.app }} schema
+        run: |
+          set -euo pipefail
+          pg() { docker run --rm --network host -v "$PWD:/w" -w /w -e SRC -e DST -e SCRATCH -e SCHEMA postgres:17 "$@"; }
+          pg sh -c 'pg_dump "$SRC" -Fc -n public --no-owner --no-privileges -f src.dump'
+          pg sh -c 'pg_restore -d "$SCRATCH" --no-owner --no-privileges --exit-on-error src.dump'
+          pg sh -c 'psql "$SCRATCH" -v ON_ERROR_STOP=1 -c "alter schema public rename to $SCHEMA; create schema public;"'
+          pg sh -c 'pg_dump "$SCRATCH" -Fc -n "$SCHEMA" --no-owner --no-privileges -f out.dump'
+          pg sh -c 'psql "$DST" -v ON_ERROR_STOP=1 -c "drop schema if exists $SCHEMA cascade"'
+          pg sh -c 'pg_restore -d "$DST" --no-owner --no-privileges --exit-on-error --single-transaction out.dump'
+          rm -f src.dump out.dump
+
+      - name: Compare row counts
+        run: |
+          set -euo pipefail
+          q="select table_name, (xpath('/row/c/text()', query_to_xml(format('select count(*) as c from %I.%I', table_schema, table_name), false, true, '')))[1]::text::int as rows from information_schema.tables where table_schema = 'SCHEMA_NAME' and table_type = 'BASE TABLE' order by 1"
+          docker run --rm --network host -e SRC -e DST -e SCHEMA -e Q="$q" postgres:17 bash -c '
+            psql "$SRC" -At -F" " -c "${Q//SCHEMA_NAME/public}" > /tmp/a
+            psql "$DST" -At -F" " -c "${Q//SCHEMA_NAME/$SCHEMA}" > /tmp/b
+            echo "table source target"; join -a1 -a2 -e MISSING -o 0,1.2,2.2 /tmp/a /tmp/b
+            diff -q /tmp/a /tmp/b && echo "ALL ROW COUNTS MATCH"'

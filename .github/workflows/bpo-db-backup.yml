@@ -25,7 +25,7 @@ jobs:
           test -n "$BACKUP_PASSPHRASE" || { echo "BACKUP_PASSPHRASE secret missing"; exit 1; }
           name="dejoiy-bpo-$(date -u +%Y-%m-%d).dump"
           docker run --rm -e URL="$BPO_DATABASE_URL" postgres:17 \
-            sh -c 'pg_dump "$URL" -Fc --no-owner --no-privileges -n core -n helpdesk -n it -n portal -n public' > "$name"
+            sh -c 'pg_dump "$URL" -Fc --no-owner --no-privileges -n core -n helpdesk -n portal -n public' > "$name"
           test -s "$name"
           gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" \
             --symmetric --cipher-algo AES256 -o "$name.gpg" "$name"
