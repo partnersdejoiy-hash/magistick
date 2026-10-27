@@ -127,6 +127,25 @@ const SCHEMA_STATEMENTS = [
   `ALTER TABLE apps ADD COLUMN IF NOT EXISTS logo TEXT NOT NULL DEFAULT ''`,
   // DEJOIY IT moved to serve-me-now.dejoiy.com (only rewrites the old seeded link).
   `UPDATE apps SET href = 'https://serve-me-now.dejoiy.com' WHERE id = 'dejoiy-it' AND href = 'https://it.dejoiy.com'`,
+  // ---- Mitra, the magistick assistant: private chats per user ----
+  `CREATE TABLE IF NOT EXISTS mitra_chats (
+     id TEXT PRIMARY KEY,
+     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+     title TEXT NOT NULL,
+     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS mitra_chats_user_idx ON mitra_chats (user_id, updated_at DESC)`,
+  `CREATE TABLE IF NOT EXISTS mitra_messages (
+     id TEXT PRIMARY KEY,
+     chat_id TEXT NOT NULL REFERENCES mitra_chats(id) ON DELETE CASCADE,
+     role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+     content TEXT NOT NULL,
+     sources JSONB NOT NULL DEFAULT '[]'::jsonb,
+     rating SMALLINT,
+     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS mitra_messages_chat_idx ON mitra_messages (chat_id, created_at)`,
 ];
 
 

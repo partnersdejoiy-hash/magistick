@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Fraunces, Outfit } from "next/font/google";
 import Header from "@/components/Header";
 import HelpFab from "@/components/HelpFab";
+import Mitra from "@/components/Mitra";
 import Magic from "@/components/Magic";
 import Providers from "@/components/Providers";
 import "./globals.css";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
           <HelpFab />
+          <Mitra />
           <footer className="border-t border-line bg-panel">
             <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-[12px] text-stone-500 sm:px-6 lg:px-8">
               <p>
