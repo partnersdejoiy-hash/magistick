@@ -12,6 +12,8 @@ import { POLICY_DOCS } from "./policyDocs";
 
 export type Source = { n: number; title: string; href: string };
 type Chunk = { title: string; href: string; text: string };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Rec = Record<string, any>;
 
 const PAGES: Chunk[] = [
   { title: "Get Help — raise a ticket", href: "/help", text: "raise ticket help desk issue problem HR IT payroll admin complaint request support get help" },
@@ -78,7 +80,7 @@ export function rank(question: string, chunks: Chunk[], limit = 5): Chunk[] {
 /** Company knowledge this employee may see, plus their apps. */
 async function knowledge(me: Me) {
   const db = sql();
-  const [posts, apps] = await Promise.all([
+  const [posts, apps] = (await Promise.all([
     db`SELECT slug, title, excerpt, body FROM posts
        WHERE (audience = 'all' OR audience = ${me.department})
          AND (region = 'global' OR lower(region) = lower(${me.location}))
@@ -89,7 +91,7 @@ async function knowledge(me: Me) {
          AND (NOT EXISTS (SELECT 1 FROM app_departments d WHERE d.app_id = a.id)
               OR EXISTS (SELECT 1 FROM app_departments d WHERE d.app_id = a.id AND d.department = ${me.department}))
        ORDER BY a.sort_order, a.name`,
-  ]);
+  ])) as Rec[][];
   const postChunks: Chunk[] = posts.map((p) => ({
     title: String(p.title),
     href: `/updates/${p.slug}`,

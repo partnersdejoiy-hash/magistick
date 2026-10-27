@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const db = sql();
   let chatId = typeof body?.chatId === "string" ? body.chatId : "";
   if (chatId) {
-    const own = await db`SELECT 1 FROM mitra_chats WHERE id = ${chatId} AND user_id = ${me.id}`;
+    const own = (await db`SELECT 1 FROM mitra_chats WHERE id = ${chatId} AND user_id = ${me.id}`) as unknown[];
     if (!own.length) return NextResponse.json({ error: "That chat no longer exists." }, { status: 404 });
   } else {
     chatId = randomUUID();
@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
     await db`INSERT INTO mitra_chats (id, user_id, title) VALUES (${chatId}, ${me.id}, ${title})`;
   }
 
-  const history = (await db`
+  const history = ((await db`
     SELECT role, content FROM mitra_messages WHERE chat_id = ${chatId}
-    ORDER BY created_at DESC LIMIT 12`).reverse() as { role: string; content: string }[];
+    ORDER BY created_at DESC LIMIT 12`) as { role: string; content: string }[]).reverse();
   await db`INSERT INTO mitra_messages (id, chat_id, role, content) VALUES (${randomUUID()}, ${chatId}, 'user', ${message})`;
 
   const { system, sources } = await prepare(me, message);

@@ -4,13 +4,15 @@ import { requireMe } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 type Ctx = { params: { id: string } };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Rec = Record<string, any>;
 
 /** GET → messages of one of the user's own chats. */
 export async function GET(_req: NextRequest, { params }: Ctx) {
   const g = await requireMe();
   if ("error" in g) return g.error;
   const db = sql();
-  const chat = await db`SELECT id, title FROM mitra_chats WHERE id = ${params.id} AND user_id = ${g.me.id}`;
+  const chat = (await db`SELECT id, title FROM mitra_chats WHERE id = ${params.id} AND user_id = ${g.me.id}`) as Rec[];
   if (!chat.length) return NextResponse.json({ error: "Chat not found." }, { status: 404 });
   const messages = await db`
     SELECT id, role, content, sources, rating FROM mitra_messages
