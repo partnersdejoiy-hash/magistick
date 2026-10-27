@@ -68,7 +68,7 @@ export function rank(question: string, chunks: Chunk[], limit = 5): Chunk[] {
       const counts = new Map<string, number>();
       for (const w of docs[i]) if (idf.has(w)) counts.set(w, (counts.get(w) ?? 0) + 1);
       let score = 0;
-      for (const [t, n] of counts) score += (1 + Math.log(n)) * idf.get(t)!;
+      counts.forEach((n, t) => (score += (1 + Math.log(n)) * idf.get(t)!));
       return { c, score };
     })
     .filter((x) => x.score > 0)
@@ -143,7 +143,7 @@ export function modelConfig() {
  * Streams the model's answer as plain text deltas. Hides <think>…</think>
  * blocks that open-source reasoning models (Qwen, DeepSeek) emit.
  */
-export async function* streamAnswer(messages: { role: string; content: string }[], signal?: AbortSignal) {
+export async function streamAnswer(messages: { role: string; content: string }[], onText: (text: string) => void, signal?: AbortSignal) {
   const cfg = modelConfig();
   if (!cfg) throw new Error("Mitra is not connected to a model yet. Set MITRA_AI_BASE_URL or AI_GATEWAY_URL in Vercel.");
   const res = await fetch(cfg.url, {
@@ -174,7 +174,7 @@ export async function* streamAnswer(messages: { role: string; content: string }[
       }
       const visible = full.replace(/<think>[\s\S]*?(<\/think>|$)/g, "").replace(/^\s+/, "");
       if (visible.length > sent) {
-        yield visible.slice(sent);
+        onText(visible.slice(sent));
         sent = visible.length;
       }
     }

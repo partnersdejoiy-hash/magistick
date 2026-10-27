@@ -48,10 +48,14 @@ export async function POST(req: NextRequest) {
       controller.enqueue(line({ type: "meta", chatId, sources }));
       let answer = "";
       try {
-        for await (const text of streamAnswer(messages, req.signal)) {
-          answer += text;
-          controller.enqueue(line({ type: "delta", text }));
-        }
+        await streamAnswer(
+          messages,
+          (text) => {
+            answer += text;
+            controller.enqueue(line({ type: "delta", text }));
+          },
+          req.signal,
+        );
         if (!answer.trim()) throw new Error("Mitra got an empty answer. Please ask again.");
         // Keep only the sources the answer actually cites; all of them if it cites none.
         const cited = sources.filter((s) => answer.includes(`[${s.n}]`));
