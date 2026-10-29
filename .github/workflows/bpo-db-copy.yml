@@ -57,6 +57,8 @@ jobs:
           set -euo pipefail
           pg() { docker run --rm --network host -v "$PWD:/w" -w /w -e SRC -e DST -e SCRATCH -e SCHEMA -e ROLE postgres:18 "$@"; }
           pg sh -c 'pg_dump "$SRC" -Fc -n public --no-owner --no-privileges -f src.dump'
+          # Postgres 18 dumps carry their own CREATE SCHEMA public, so start the scratch copy without one
+          pg sh -c 'psql "$SCRATCH" -v ON_ERROR_STOP=1 -c "drop schema public cascade"'
           pg sh -c 'pg_restore -d "$SCRATCH" --no-owner --no-privileges --exit-on-error src.dump'
           pg sh -c 'psql "$SCRATCH" -v ON_ERROR_STOP=1 -c "alter schema public rename to $SCHEMA; create schema public;"'
           pg sh -c 'pg_dump "$SCRATCH" -Fc -n "$SCHEMA" --no-owner --no-privileges -f out.dump'
