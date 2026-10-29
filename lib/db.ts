@@ -224,6 +224,17 @@ const SEED_APPS = [
     sort_order: 6,
     logo: "https://uplift.dejoiy.com/icon.svg",
   },
+  {
+    id: "tempo",
+    name: "Tempo",
+    blurb: "Schedules, shift trades & time off",
+    category: "Work",
+    href: "/api/sso/tempo",
+    icon: "clock",
+    color: "#1967C2",
+    sort_order: 7,
+    logo: "https://tempo.dejoiy.com/icon.svg",
+  },
 ];
 
 let ready: Promise<void> | null = null;
