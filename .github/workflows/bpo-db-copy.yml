@@ -76,7 +76,10 @@ jobs:
           begin
             execute format('alter schema %I owner to %I', s, o);
             for r in select c.relname, c.relkind from pg_class c join pg_namespace n on n.oid = c.relnamespace
-                     where n.nspname = s and c.relkind in ('r','p','v','m','S','f') loop
+                     where n.nspname = s and c.relkind in ('r','p','v','m','S','f')
+                       -- serial/identity sequences follow their table
+                       and not (c.relkind = 'S' and exists (select 1 from pg_depend d where d.objid = c.oid and d.deptype in ('a','i')))
+                     order by c.relkind <> 'r' loop
               execute format('alter %s %I.%I owner to %I',
                 case r.relkind when 'S' then 'sequence' when 'v' then 'view' when 'm' then 'materialized view' when 'f' then 'foreign table' else 'table' end,
                 s, r.relname, o);
