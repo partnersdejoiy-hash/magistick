@@ -213,6 +213,17 @@ const SEED_APPS = [
     sort_order: 5,
     logo: "https://orbitdesk.dejoiy.com/dejoiy-official-logo.png",
   },
+  {
+    id: "uplift",
+    name: "Uplift",
+    blurb: "Coaching logs, 1:1s, wellness & growth",
+    category: "Work",
+    href: "/api/sso/uplift",
+    icon: "award",
+    color: "#E91E63",
+    sort_order: 6,
+    logo: "https://uplift.dejoiy.com/icon.svg",
+  },
 ];
 
 let ready: Promise<void> | null = null;
