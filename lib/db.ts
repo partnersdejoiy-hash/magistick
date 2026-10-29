@@ -28,8 +28,14 @@ let _sql: Sql | null = null;
 export function sql(): Sql {
   // SUPABASE_DATABASE_URL (magistick_app role, schema "portal" in the DEJOIY BPO database) wins;
   // without it magistick keeps using its old DATABASE_URL, so switching back is one env var.
-  const url = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL;
+  // Forgive copy-paste slips in Vercel: spaces, wrapping quotes, or a pasted "KEY=" prefix.
+  const url = (process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL || "")
+    .trim()
+    .replace(/^[A-Z_]+=/, "")
+    .replace(/^["'`]+|["'`]+$/g, "")
+    .trim();
   if (!url) throw new Error("SUPABASE_DATABASE_URL is not set — add it in Vercel env vars.");
+  if (!/^postgres(ql)?:\/\//.test(url)) throw new Error("SUPABASE_DATABASE_URL must start with postgresql:// — check the value in Vercel.");
   if (!_sql) {
     const pool = new pg.Pool({ connectionString: url, max: 3, idleTimeoutMillis: 10_000, connectionTimeoutMillis: 5_000 });
     const query = async (text: string, params: unknown[] = []) => (await pool.query(text, params)).rows as Rows;
