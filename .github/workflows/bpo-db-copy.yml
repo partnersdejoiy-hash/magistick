@@ -1,14 +1,17 @@
 name: BPO database copy
 
 # Copies one app's current database (Neon, schema public) into its own schema
-# in the DEJOIY BPO Supabase database. Re-running replaces the target schema.
+# in the DEJOIY BPO Supabase database, owned by that app's login role.
+# Re-running replaces the target schema (do it right before switching the app).
+#   orbitdesk -> helpdesk (orbitdesk_app)   magistick -> portal (magistick_app)
+#   chronix   -> chronix  (chronix_app)     serveme   -> serveme (serveme_app)
 on:
   workflow_dispatch:
     inputs:
       app:
         description: "Which app to copy"
         type: choice
-        options: [orbitdesk, magistick]
+        options: [orbitdesk, magistick, chronix, serveme]
 
 permissions:
   contents: read
@@ -30,23 +33,29 @@ jobs:
       - name: Pick source and target
         env:
           APP: ${{ inputs.app }}
+          TARGET: ${{ secrets.BPO_DATABASE_URL }}
           ORBITDESK_SOURCE_URL: ${{ secrets.ORBITDESK_SOURCE_URL }}
-          ORBITDESK_TARGET_URL: ${{ secrets.ORBITDESK_TARGET_URL }}
           MAGISTICK_SOURCE_URL: ${{ secrets.MAGISTICK_SOURCE_URL }}
-          MAGISTICK_TARGET_URL: ${{ secrets.MAGISTICK_TARGET_URL }}
+          CHRONIX_SOURCE_URL: ${{ secrets.CHRONIX_SOURCE_URL }}
+          SERVEME_SOURCE_URL: ${{ secrets.SERVEME_SOURCE_URL }}
         run: |
           set -euo pipefail
-          if [ "$APP" = orbitdesk ]; then src="$ORBITDESK_SOURCE_URL"; dst="$ORBITDESK_TARGET_URL"; schema=helpdesk
-          else src="$MAGISTICK_SOURCE_URL"; dst="$MAGISTICK_TARGET_URL"; schema=portal; fi
-          test -n "$src" || { echo "Source URL secret for $APP is missing"; exit 1; }
-          test -n "$dst" || { echo "Target URL secret for $APP is missing"; exit 1; }
-          echo "::add-mask::$src"; echo "::add-mask::$dst"
-          { echo "SRC=$src"; echo "DST=$dst"; echo "SCHEMA=$schema"; } >> "$GITHUB_ENV"
+          case "$APP" in
+            orbitdesk) src="$ORBITDESK_SOURCE_URL"; schema=helpdesk; role=orbitdesk_app ;;
+            magistick) src="$MAGISTICK_SOURCE_URL"; schema=portal; role=magistick_app ;;
+            chronix)   src="$CHRONIX_SOURCE_URL";   schema=chronix; role=chronix_app ;;
+            serveme)   src="$SERVEME_SOURCE_URL";   schema=serveme; role=serveme_app ;;
+          esac
+          test -n "$src" || { echo "Secret ${APP^^}_SOURCE_URL is missing"; exit 1; }
+          test -n "$TARGET" || { echo "Secret BPO_DATABASE_URL is missing"; exit 1; }
+          src="${src//&channel_binding=require/}"; src="${src//channel_binding=require&/}"
+          echo "::add-mask::$src"; echo "::add-mask::$TARGET"
+          { echo "SRC=$src"; echo "DST=$TARGET"; echo "SCHEMA=$schema"; echo "ROLE=$role"; } >> "$GITHUB_ENV"
 
       - name: Copy public -> ${{ inputs.app }} schema
         run: |
           set -euo pipefail
-          pg() { docker run --rm --network host -v "$PWD:/w" -w /w -e SRC -e DST -e SCRATCH -e SCHEMA postgres:17 "$@"; }
+          pg() { docker run --rm --network host -v "$PWD:/w" -w /w -e SRC -e DST -e SCRATCH -e SCHEMA -e ROLE postgres:17 "$@"; }
           pg sh -c 'pg_dump "$SRC" -Fc -n public --no-owner --no-privileges -f src.dump'
           pg sh -c 'pg_restore -d "$SCRATCH" --no-owner --no-privileges --exit-on-error src.dump'
           pg sh -c 'psql "$SCRATCH" -v ON_ERROR_STOP=1 -c "alter schema public rename to $SCHEMA; create schema public;"'
@@ -54,6 +63,38 @@ jobs:
           pg sh -c 'psql "$DST" -v ON_ERROR_STOP=1 -c "drop schema if exists $SCHEMA cascade"'
           pg sh -c 'pg_restore -d "$DST" --no-owner --no-privileges --exit-on-error --single-transaction out.dump'
           rm -f src.dump out.dump
+
+      - name: Hand the schema to the app role and let Workloom in
+        run: |
+          set -euo pipefail
+          cat > own.sql <<'SQL'
+          select set_config('wl.schema', :'schema', false), set_config('wl.role', :'role', false);
+          do $own$
+          declare r record; s text := current_setting('wl.schema'); o text := current_setting('wl.role');
+          begin
+            execute format('alter schema %I owner to %I', s, o);
+            for r in select c.relname, c.relkind from pg_class c join pg_namespace n on n.oid = c.relnamespace
+                     where n.nspname = s and c.relkind in ('r','p','v','m','S','f') loop
+              execute format('alter %s %I.%I owner to %I',
+                case r.relkind when 'S' then 'sequence' when 'v' then 'view' when 'm' then 'materialized view' when 'f' then 'foreign table' else 'table' end,
+                s, r.relname, o);
+            end loop;
+            for r in select t.typname from pg_type t join pg_namespace n on n.oid = t.typnamespace
+                     where n.nspname = s and t.typtype in ('e','d','c') and not exists (select 1 from pg_class c where c.reltype = t.oid) loop
+              execute format('alter type %I.%I owner to %I', s, r.typname, o);
+            end loop;
+            for r in select p.oid::regprocedure as f from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = s loop
+              execute format('alter function %s owner to %I', r.f, o);
+            end loop;
+            -- Workloom is the people master: it reads every app and keeps each app's user accounts in step.
+            execute format('grant usage on schema %I to workloom_app', s);
+            execute format('grant select on all tables in schema %I to workloom_app', s);
+            execute format('alter default privileges for role %I in schema %I grant select on tables to workloom_app', o, s);
+          end $own$;
+          SQL
+          docker run --rm --network host -v "$PWD:/w" -w /w -e DST -e SCHEMA -e ROLE postgres:17 \
+            sh -c 'psql "$DST" -v ON_ERROR_STOP=1 -v schema="$SCHEMA" -v role="$ROLE" -f own.sql'
+          rm -f own.sql
 
       - name: Compare row counts
         run: |
