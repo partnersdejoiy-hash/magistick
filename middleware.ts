@@ -33,6 +33,7 @@ export async function middleware(req: NextRequest) {
     pathname === "/favicon.ico" ||
     pathname === "/login" ||
     pathname === "/api/auth/login" ||
+    pathname === "/api/sso/uplift" || // handles signed-out itself: back to /login, then into Uplift
     /\.[a-z0-9]+$/i.test(pathname)
   ) {
     return NextResponse.next();
