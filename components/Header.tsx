@@ -15,6 +15,7 @@ const NAV = [
   { href: "/updates", label: "Updates" },
   { href: "/directory", label: "Directory" },
   { href: "/team", label: "Team" },
+  { href: "/uplift", label: "Uplift" },
   { href: "/policies", label: "Policies" },
   { href: "/help", label: "Get Help" },
   { href: "/new-hire", label: "New Hire" },
