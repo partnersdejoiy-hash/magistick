@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 30
     services:
       scratch:
-        image: postgres:17
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: scratch
         ports: ["5432:5432"]
@@ -55,7 +55,7 @@ jobs:
       - name: Copy public -> ${{ inputs.app }} schema
         run: |
           set -euo pipefail
-          pg() { docker run --rm --network host -v "$PWD:/w" -w /w -e SRC -e DST -e SCRATCH -e SCHEMA -e ROLE postgres:17 "$@"; }
+          pg() { docker run --rm --network host -v "$PWD:/w" -w /w -e SRC -e DST -e SCRATCH -e SCHEMA -e ROLE postgres:18 "$@"; }
           pg sh -c 'pg_dump "$SRC" -Fc -n public --no-owner --no-privileges -f src.dump'
           pg sh -c 'pg_restore -d "$SCRATCH" --no-owner --no-privileges --exit-on-error src.dump'
           pg sh -c 'psql "$SCRATCH" -v ON_ERROR_STOP=1 -c "alter schema public rename to $SCHEMA; create schema public;"'
@@ -92,7 +92,7 @@ jobs:
             execute format('alter default privileges for role %I in schema %I grant select on tables to workloom_app', o, s);
           end $own$;
           SQL
-          docker run --rm --network host -v "$PWD:/w" -w /w -e DST -e SCHEMA -e ROLE postgres:17 \
+          docker run --rm --network host -v "$PWD:/w" -w /w -e DST -e SCHEMA -e ROLE postgres:18 \
             sh -c 'psql "$DST" -v ON_ERROR_STOP=1 -v schema="$SCHEMA" -v role="$ROLE" -f own.sql'
           rm -f own.sql
 
@@ -100,7 +100,7 @@ jobs:
         run: |
           set -euo pipefail
           q="select table_name, (xpath('/row/c/text()', query_to_xml(format('select count(*) as c from %I.%I', table_schema, table_name), false, true, '')))[1]::text::int as rows from information_schema.tables where table_schema = 'SCHEMA_NAME' and table_type = 'BASE TABLE' order by 1"
-          docker run --rm --network host -e SRC -e DST -e SCHEMA -e Q="$q" postgres:17 bash -c '
+          docker run --rm --network host -e SRC -e DST -e SCHEMA -e Q="$q" postgres:18 bash -c '
             psql "$SRC" -At -F" " -c "${Q//SCHEMA_NAME/public}" > /tmp/a
             psql "$DST" -At -F" " -c "${Q//SCHEMA_NAME/$SCHEMA}" > /tmp/b
             echo "table source target"; join -a1 -a2 -e MISSING -o 0,1.2,2.2 /tmp/a /tmp/b
